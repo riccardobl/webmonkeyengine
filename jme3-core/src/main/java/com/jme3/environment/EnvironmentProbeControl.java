@@ -14,6 +14,7 @@ import com.jme3.export.JmeImporter;
 import com.jme3.export.OutputCapsule;
 import com.jme3.light.LightProbe;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.Caps;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.Geometry;
@@ -119,13 +120,22 @@ public class EnvironmentProbeControl extends LightProbe implements Control {
     void rebakeNow(RenderManager renderManager) {
         if (assetManager == null) {
             LOG.log(Level.SEVERE, "AssetManager is null, cannot bake environment. Please use setAssetManager() to set it.");
-            return;            
+            return;
         }
+        Format colorFormat=Format.RGB8;
+        if(renderManager.getRenderer().getCaps().contains(Caps.FloatColorBufferRGB)){
+            colorFormat=Format.RGB16F;
+        }else if(renderManager.getRenderer().getCaps().contains(Caps.FloatColorBufferRGBA)){
+            colorFormat=Format.RGBA16F;
+        } else if (renderManager.getRenderer().getCaps().contains(Caps.PackedFloatColorBuffer)) {
+            colorFormat = Format.RGB111110F;
+        }
+        
         IBLHybridEnvBakerLight baker;
         if(!USE_GL_IR){
-            baker = new IBLHybridEnvBakerLight(renderManager, assetManager, Format.RGB16F, Format.Depth, envMapSize, envMapSize);
+            baker = new IBLHybridEnvBakerLight(renderManager, assetManager, colorFormat, Format.Depth, envMapSize, envMapSize);
         } else {
-            baker = new IBLGLEnvBakerLight(renderManager, assetManager, Format.RGB16F, Format.Depth, envMapSize, envMapSize);
+            baker = new IBLGLEnvBakerLight(renderManager, assetManager, colorFormat, Format.Depth, envMapSize, envMapSize);
         }
         baker.setTexturePulling(isSerializeBakeResults());
 

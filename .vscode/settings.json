@@ -3,5 +3,26 @@
     "java.refactor.renameFromFileExplorer": "prompt",
     "java.format.settings.url": "./.vscode/JME_style.xml",
     "editor.formatOnPaste": true,
-    "editor.formatOnType": true
+    "editor.formatOnType": true,
+    "java.compile.nullAnalysis.mode": "automatic",
+    "files.exclude": {
+        "**/.git": true,
+        "**/.svn": true,
+        "**/.hg": true,
+        "**/CVS": true,
+        "**/.DS_Store": true,
+        "**/Thumbs.db": true,
+        // "jme3-android": true,
+        // "jme3-awt-dialogs": true,
+        // "jme3-networking": true,
+        // "jme3-plugins": true,
+        // "jme3-lwjgl3": true,
+        // "jme3-examples": true,
+        // "jme3-lwjgl": true,
+        // "jme3-desktop": true,
+        // "jme3-jbullet": true,
+        // "jme3-android-examples":true,
+        // "jme3-vr":true
+    },
+    "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx4G -Xms100m -javaagent:\"/home/riccardo/.vscode/extensions/gabrielbb.vscode-lombok-1.0.1/server/lombok.jar\""
 }

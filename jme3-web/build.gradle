@@ -1,0 +1,182 @@
+import java.security.MessageDigest
+import java.nio.file.Files
+import java.nio.file.Paths
+plugins {
+    id "java"
+    id "war"
+    id "org.teavm" version "0.8.1"
+    id "io.github.0ffz.github-packages" version "1.2.1"
+
+}
+configurations {
+    compileOnlyWithResources {
+        canBeResolved = true
+    }
+}
+repositories {
+    mavenCentral()
+        maven githubPackage.invoke("riccardobl")
+}
+
+
+dependencies {
+    compileOnlyWithResources project(':jme3-core')
+    compileOnlyWithResources project(':jme3-testdata')
+    compileOnlyWithResources project(':jme3-plugins')
+    compileOnlyWithResources project(':jme3-effects')
+    compileOnlyWithResources project(':jme3-terrain')
+    api project(':jme3-core')
+    api project(':jme3-testdata')
+
+    api( project(':jme3-plugins')){
+        exclude group: 'com.google.code.gson', module: 'gson'
+        exclude module: 'jme3-plugins-json-gson'
+
+    }
+    implementation project(':jme3-plugins-json')
+    api project(':jme3-effects')
+    api project(':jme3-terrain')
+        api project(':jme3-jogg')
+
+    // api (project(':jme3-jbullet'))
+
+    api "org.teavm:teavm-tooling:0.8.1"
+    api "org.teavm:teavm-core:0.8.1"
+    api "org.teavm:teavm-classlib:0.8.1"
+    // api 'javax.vecmath:vecmath:1.5.2'
+
+    implementation teavm.libs.jsoApis
+    implementation teavm.libs.jso
+    implementation teavm.libs.metaprogramming
+}
+
+
+
+task copyAllResources(type: Copy) {
+    from "src/main/resources"
+    configurations.each { configuration ->
+        if (! configuration.name.endsWith('WithResources')) return;
+        configuration.resolve().each { File file ->
+            System.out.println(configuration.name+" "+file);
+            if (file.isDirectory()) {
+                from file
+            } else {
+                from zipTree(file) 
+            }
+        }
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE // You can change this to any other strategy
+    // Specify the output directory for all resources
+    into "$buildDir/generated/teavm/js/" // Change this path to the desired output directory
+}
+ 
+ 
+
+
+task generateResourcesIndex {
+    dependsOn copyAllResources
+
+    doLast {
+        def outputDir = file("$buildDir/generated/teavm/js/")
+        def outputFile = file("$buildDir/generated/teavm/js/resourcesIndex.txt")
+
+        outputFile.text = generateHashes(outputDir)
+    }
+}
+
+def generateHashes(File dir) {
+    def hashes = []
+    Files.walk(Paths.get(dir.toURI())).filter { 
+        Files.isRegularFile(it) 
+    }.forEach { file ->
+        def relativePath = dir.toPath().relativize(file).toString()
+        if(relativePath.endsWith(".class")) return;
+        if(relativePath.endsWith(".java")) return;
+        def hash = generateSHA256(file.toFile())
+        hashes << "$hash $relativePath"
+    }
+    return hashes.join('\n')
+}
+
+def generateSHA256(file) {
+    def messageDigest = MessageDigest.getInstance("SHA-256")
+    file.eachByte(4096) { bytes, len ->
+        messageDigest.update(bytes, 0, len)
+    }
+    return messageDigest.digest().collect { String.format("%02x", it) }.join()
+}
+
+
+
+
+teavm.js {
+    addedToWebApp = true
+    mainClass = "com.jme3.web.WebApp"
+    obfuscated = false
+    debugInformation = true
+    strict= false
+    outOfProcess=false
+    // processMemory=6000
+    fastGlobalAnalysis=false
+    optimization=org.teavm.gradle.api.OptimizationLevel.NONE
+    sourceMap=true
+    
+    def classesToPreserve=[
+        "**/J3MLoader.java",
+        "**/WAVLoader.java",
+        "**/CursorLoader.java",
+        "**/WebLocator.java",
+        "**/*Logic.java",
+        "**/*AssetCache.java",
+        "**/*Processor.java",
+        "**/StbImageLoader.java",
+        "**/GLSLLoader.java",
+        "**/CloneableAssetProcessor.java",
+        "**/BinaryLoader.java",
+                "**/ShaderNodeDefinitionLoader.java",
+        "**/HeapAllocator.java",
+        "**/SinglePassAndImageBasedLightingLogic.java",
+          "**/OGGLoader.java",
+        //  "**/OBJLoader.java",
+        //  "**/MTLLoader.java",
+
+         "**/GltfLoader.java",
+         "**/BinLoader.java",
+         "**/GlbLoader.java",
+
+        "**/HDRLoader.java",
+         "**/TGALoader.java",
+         "**/DDSLoader.java",
+
+        "**/BitmapFontLoader.java",
+
+
+    ]
+    def projects = [
+        project(':jme3-core'),
+        project(':jme3-web'),
+        project(':jme3-jogg'),
+        project(':jme3-effects'),
+        project(':jme3-terrain'),
+        project(':jme3-plugins'),
+    ]
+
+    for(def project in projects) {
+       def mainJavaDirs = project.sourceSets.main.java.srcDirs.iterator();
+       while(true){
+            if(!mainJavaDirs.hasNext()) break;
+            def mainJavaDir=mainJavaDirs.next();
+            
+            fileTree(mainJavaDir).matching {
+                include classesToPreserve
+            }.forEach { file ->
+                def filePath = file.path.replaceAll('\\.java$', '').replaceAll('/', '.').substring(mainJavaDir.path.length() + 1)
+                System.out.println("preserve " + filePath)
+                preservedClasses.add(filePath)
+            }
+       }
+    }
+    
+    targetFileName = "jmeapp.js"
+}

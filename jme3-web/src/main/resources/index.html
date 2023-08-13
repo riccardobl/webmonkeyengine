@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Powered by jMonkeyEngine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <!-- <script type="text/javascript" charset="utf-8" src="debug/webgl-lint.js"></script> -->
+  <!-- <script type="text/javascript" charset="utf-8" src="howler.js"></script> -->
+  <script type="text/javascript" charset="utf-8" src="jme.js"></script>
+  <!-- <script type="text/javascript" charset="utf-8" src="physics/ammo.js"></script>
+  <script type="text/javascript" charset="utf-8" src="jmeapp.js"></script> -->
+
+  <script>
+
+    function init(demo) {
+      document.querySelectorAll('button#startJme').forEach((btn) => {
+        btn.style.display = 'none';
+      });
+      const canvasJme = document.querySelector('canvas#jme');
+      canvasJme.style.display = 'block';
+      window.jme.canvasFitParent(canvasJme);
+      jme.start(demo);
+    }
+  </script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #1a1a1a;
+      font-size: 1.3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+
+    }
+
+    canvas#jme {
+      top: 0;
+      left: 0;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    button#startJme {
+      font-size: 2rem;
+      padding: 1rem;
+      margin: auto;
+      background-color: #d88d02;
+      color: #1a1a1a;
+      font-weight: bold;
+      box-shadow: 0 0 133px #d88d02a4;
+      border: 2px solid #d88d02;
+      border-radius: 16px;
+      font-family: monospace;
+
+      display: block;
+    }
+
+    #jmeProgress {
+      display: flex;
+      position: fixed;
+      top: 0;
+      left: 0;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      background: #1a1a1a;
+      color: #d88d02;
+      font-family: monospace;
+      text-transform: uppercase;
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    /*style for progress bar*/
+    #jmeProgress progress {
+
+      all: unset;
+      -webkit-appearance: none;
+      margin: 1rem;
+      width: 32rem;
+      max-width: 90%;
+      height: 1rem;
+      background: #1a1a1a;
+      box-shadow: 0 0 133px #d88d02a4;
+      border: 2px solid #d88d02;
+      border-radius: 32px;
+      overflow: hidden;
+    }
+
+    #jmeProgress progress::-webkit-progress-bar {
+      background-color: #1a1a1a;
+    }
+
+    #jmeProgress progress::-webkit-progress-value {
+      background-color: #d88d02;
+    }
+
+    #jmeProgress progress::-moz-progress-bar {
+      background-color: #d88d02;
+    }
+
+    #poweredBy img {
+      width: 15rem;
+      max-width: 90vw;
+    }
+
+    #poweredBy {
+
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: bold;
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas style="display:none" id="jme"></canvas>
+  <button id="startJme" onClick="init('pbr')"> Start PBR Demo</button>
+
+  <button id="startJme" onClick="init('physics')"> Start Physics Demo</button>
+  <button id="startJme" onClick="init('shadows')"> Start Shadows Demo</button>
+
+
+</body>
+
+</html>

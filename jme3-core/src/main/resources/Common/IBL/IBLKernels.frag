@@ -4,9 +4,9 @@
 *               https://learnopengl.com/PBR/IBL/Specular-IBL
 *   - Riccardo Balbo
 */
+#import "Common/ShaderLib/GLSLCompat.glsllib"
 #import "Common/IBL/Math.glsllib"
 
-out vec4 outFragColor;
 in vec2 TexCoords;
 in vec3 LocalPos;
 

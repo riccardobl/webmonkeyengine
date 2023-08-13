@@ -102,15 +102,19 @@ public class IBLHybridEnvBakerLight extends GenericEnvBaker implements IBLEnvBak
             int mipWidth = (int) (specular.getImage().getWidth() * FastMath.pow(0.5f, mip));
             int mipHeight = (int) (specular.getImage().getHeight() * FastMath.pow(0.5f, mip));
 
-            FrameBuffer specularbaker = new FrameBuffer(mipWidth, mipHeight, 1);
-            specularbaker.setSrgb(false);
-            for (int i = 0; i < 6; i++) specularbaker.addColorTarget(FrameBufferTarget.newTarget(specular).level(mip).face(i));
+            FrameBuffer specularbakers[] = new FrameBuffer[6];
+            for(int i=0;i<6;i++){
+                specularbakers[i]=new FrameBuffer(mipWidth,mipHeight,1);
+                specularbakers[i].setSrgb(false);
+                specularbakers[i].addColorTarget(FrameBufferTarget.newTarget(specular).level(mip).face(i));
+            }
+
 
             float roughness = (float) mip / (float) (specular.getImage().getMipMapSizes().length - 1);
             mat.setFloat("Roughness", roughness);
 
             for (int i = 0; i < 6; i++) {
-                specularbaker.setTargetIndex(i);
+                FrameBuffer specularbaker = specularbakers[i];
                 mat.setInt("FaceId", i);
 
                 screen.updateLogicalState(0);
@@ -123,7 +127,9 @@ public class IBLHybridEnvBakerLight extends GenericEnvBaker implements IBLEnvBak
                 if (isTexturePulling()) pull(specularbaker, specular, i);
 
             }
-            specularbaker.dispose();
+            for (int i = 0; i < 6; i++) {
+                specularbakers[i].dispose();
+            }
         }
         
         if (isTexturePulling()) endPulling(specular);

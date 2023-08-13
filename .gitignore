@@ -49,3 +49,5 @@ javadoc_deploy
 javadoc_deploy.pub
 !.vscode/settings.json
 !.vscode/JME_style.xml
+/jme3-web/build
+*.hprof

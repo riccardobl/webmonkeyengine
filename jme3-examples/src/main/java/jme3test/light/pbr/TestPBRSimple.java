@@ -6,6 +6,11 @@ import com.jme3.environment.EnvironmentProbeControl;
 import com.jme3.input.ChaseCamera;
 import com.jme3.material.Material;
 import com.jme3.math.FastMath;
+import com.jme3.math.Vector3f;
+import com.jme3.post.FilterPostProcessor;
+import com.jme3.post.filters.ContrastAdjustmentFilter;
+import com.jme3.post.filters.FXAAFilter;
+import com.jme3.post.filters.ToneMapFilter;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
 import com.jme3.util.SkyFactory;
@@ -51,6 +56,16 @@ public class TestPBRSimple extends SimpleApplication {
         // Tag the sky, only the tagged spatials will be rendered in the env map
         EnvironmentProbeControl.tag(sky);
 
+        FilterPostProcessor fpp = new FilterPostProcessor(assetManager);
+        int numSamples = context.getSettings().getSamples();
+        if (numSamples > 0) {
+            fpp.setNumSamples(numSamples);
+        }
+
+        
+        fpp.addFilter(new ToneMapFilter(Vector3f.UNIT_XYZ.mult(4.0f)));
+        fpp.addFilter(new FXAAFilter());
+        viewPort.addProcessor(fpp);
 
         
     }
