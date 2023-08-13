@@ -113,14 +113,14 @@ def generateSHA256(file) {
 teavm.js {
     addedToWebApp = true
     mainClass = "com.jme3.web.WebApp"
-    obfuscated = false
-    debugInformation = true
+    obfuscated = true
+    debugInformation = false
     strict= false
     outOfProcess=false
     // processMemory=6000
     fastGlobalAnalysis=false
-    optimization=org.teavm.gradle.api.OptimizationLevel.NONE
-    sourceMap=true
+    // optimization=org.teavm.gradle.api.OptimizationLevel.NONE
+    sourceMap=false
     
     def classesToPreserve=[
         "**/J3MLoader.java",
