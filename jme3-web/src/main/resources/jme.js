@@ -101,10 +101,20 @@ if (!window.jme.setProgress) window.jme.setProgress = function (progress, messag
 if (!window.jme.resources) window.jme.resources = {
     id: "jmeApp",
     cacheDir: undefined,
-    preloadFilters: undefined,
+    prefetchFilters: undefined,
     index: undefined,
-    path: "./",
     preloadPos: 0,
+
+    _fullPath(path) {
+        if (path.startsWith("/")) {
+            path=path.substring(1);
+        }
+        let basePath = window.location.origin + window.location.pathname;
+        if (basePath.endsWith("/")) {
+            basePath = basePath.substring(0, basePath.length - 1);
+        }
+        return basePath + "/" + encodeURI(path);
+    },
 
 
     /**
@@ -115,7 +125,7 @@ if (!window.jme.resources) window.jme.resources = {
         try {
             if (!this.index) {
                 this.index = {};
-                const lines = (await fetch(this.path + "resourcesIndex.txt").then(r => r.text())).split("\n");
+                const lines = (await fetch(this._fullPath( "resourcesIndex.txt")).then(r => r.text())).split("\n");
                 for (const line of lines) {
 
                     let [hash, ...path] = line.split(" ");
@@ -129,19 +139,19 @@ if (!window.jme.resources) window.jme.resources = {
             console.warn("Error loading resources index", e);
         }
         try {
-            if (!this.preloadFilters) {
+            if (!this.prefetchFilters) {
                 try {
-                    this.preloadFilters = [];
-                    const preloadFiltersLines = (await fetch(this.path + "resourcesPreloadFilters.txt").then(r => r.text())).split("\n");
-                    for (let line of preloadFiltersLines) {
+                    this.prefetchFilters = [];
+                    const prefetchFiltersLines = (await fetch(this._fullPath("resourcesPrefetchFilters.txt")).then(r => r.text())).split("\n");
+                    for (let line of prefetchFiltersLines) {
                         line = line.trim();
-                        if (line) this.preloadFilters.push(new RegExp(line));
+                        if (line) this.prefetchFilters.push(new RegExp(line));
                     }
 
                 } catch (e) {
                     console.error(e);
                 }
-                console.log("Loaded " + this.preloadFilters.length + " preload filters.");
+                console.log("Loaded " + this.prefetchFilters.length + " preload filters.");
             }
         } catch (e) {
             console.error("Error loading resources preload filters", e);
@@ -163,7 +173,7 @@ if (!window.jme.resources) window.jme.resources = {
     },
 
 
-    preload: async function (res) {
+    prefetch: async function (res) {
         try {
             await this.init();
             const entries = Object.entries(this.index);
@@ -178,7 +188,7 @@ if (!window.jme.resources) window.jme.resources = {
                     let hash;
                     try {
                         [path, hash] = nextToPreload;
-                        for (const preloadFilter of this.preloadFilters) {
+                        for (const preloadFilter of this.prefetchFilters) {
                             if (preloadFilter.test(path)) {
                                 if (!(await this.getCachedBuffer(path))) {
                                     console.log("Download " + path);
@@ -202,7 +212,7 @@ if (!window.jme.resources) window.jme.resources = {
             }
             this.preloadPos++;
             if (this.preloadPos < entries.length) {
-                setTimeout(() => this.preload(res), 2);
+                setTimeout(() => this.prefetch(res), 2);
             } else {
                 console.log("Resources downloaded!");
                 res(true);
@@ -351,7 +361,7 @@ if (!window.jme.resources) window.jme.resources = {
         await this.init();
         let entry = await this.getCachedBuffer(name);
         if (!entry) {
-            entry = await fetch(encodeURI(this.path + name)).then(r => r.arrayBuffer());
+            entry = await fetch(this._fullPath(name)).then(r => r.arrayBuffer());
             await this.setCachedBuffer(name, entry);
         }
         const int8Array = new Int8Array(entry);

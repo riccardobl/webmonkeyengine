@@ -23,13 +23,13 @@ public class TeaJSONObject extends TeaJSONElement implements JsonObject {
     @Override
     public JsonArray getAsJsonArray(String string) {
         if (!JSObjects.hasProperty(element, string)) return null;
-        return new TeaJSONArray(obj().get(string).cast());
+        return new TeaJSONArray(((org.teavm.jso.JSObject)obj().get(string)).cast());
     }
 
     @Override
     public JsonObject getAsJsonObject(String string) {
         if (!JSObjects.hasProperty(element, string)) return null;
-        return new TeaJSONObject(obj().get(string).cast());
+        return new TeaJSONObject(((org.teavm.jso.JSObject)obj().get(string)).cast());
     }
 
     @Override
@@ -40,7 +40,7 @@ public class TeaJSONObject extends TeaJSONElement implements JsonObject {
     @Override
     public JsonElement get(String string) {
         if (!JSObjects.hasProperty(element, string)) return null;
-        return new TeaJSONElement(obj().get(string));
+        return new TeaJSONElement(((org.teavm.jso.JSObject)obj().get(string)));
         
     }
 
@@ -59,7 +59,7 @@ public class TeaJSONObject extends TeaJSONElement implements JsonObject {
 
                 @Override
                 public TeaJSONElement getValue() {
-                    return new TeaJSONElement(obj().get(key));
+                    return new TeaJSONElement((org.teavm.jso.JSObject)obj().get(key));
                 }
 
                 @Override
@@ -77,6 +77,6 @@ public class TeaJSONObject extends TeaJSONElement implements JsonObject {
     @Override
     public JsonPrimitive getAsJsonPrimitive(String string) {
         if (!JSObjects.hasProperty(element, string)) return null;
-        return new TeaJSONPrimitive(obj().get(string).cast());
+        return new TeaJSONPrimitive(((org.teavm.jso.JSObject)obj().get(string)).cast());
     }
 }

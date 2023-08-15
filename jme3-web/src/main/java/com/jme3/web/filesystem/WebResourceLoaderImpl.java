@@ -31,10 +31,10 @@ public class WebResourceLoaderImpl implements ResourcesLoaderImpl {
           
     }
 
-    void preload() {
+    void prefetch() {
         while (preloadStatus == 1) {
             try {
-                System.out.println("Waiting for preload");
+                System.out.println("Waiting for prefetch");
                 Thread.sleep(100);
                 
             } catch (InterruptedException e) {
@@ -44,7 +44,7 @@ public class WebResourceLoaderImpl implements ResourcesLoaderImpl {
         if (preloadStatus == 0) return;
         preloadStatus = 1;
 
-        boolean res=WebResourceLoaderWrapper.jmeResourcesPreload();
+        boolean res=WebResourceLoaderWrapper.jmeResourcesPrefetch();
         System.out.println("Done " + res);
         preloadStatus = 0;
     }
@@ -93,7 +93,7 @@ public class WebResourceLoaderImpl implements ResourcesLoaderImpl {
 
     @Override
     public URL getResource(String path, Class<?> clazz) {
-        preload();
+        prefetch();
         path = getFullPath(clazz, path);
         logger.log(Level.FINE, "Fetch resource {0}", path);
         try {
@@ -106,7 +106,7 @@ public class WebResourceLoaderImpl implements ResourcesLoaderImpl {
 
     @Override
     public InputStream getResourceAsStream(String path, Class<?> clazz) {
-        preload();
+        prefetch();
         path = getFullPath(clazz, path);
         logger.log(Level.FINE, "Fetch resource as stream {0}", path);
         try {
@@ -122,7 +122,7 @@ public class WebResourceLoaderImpl implements ResourcesLoaderImpl {
 
     @Override
     public Enumeration<URL> getResources(String path, Class<?> clazz) throws IOException {
-        preload();
+        prefetch();
         List<URL> urls = new ArrayList<URL>();
         try {
             String index[] = WebResourceLoaderWrapper.jmeResourcesGetIndex();

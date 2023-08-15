@@ -87,6 +87,12 @@ public class TestPhysics extends SimpleApplication {
 
     }
 
+    @Override
+    public void simpleUpdate(float tpf) {
+        updateCrossHair();
+        
+    }
+
     /** Add InputManager action: Left click triggers shooting. */
     private void initInputs() {
         inputManager.addMapping("shoot", new MouseButtonTrigger(MouseInput.BUTTON_LEFT));
@@ -190,15 +196,20 @@ public class TestPhysics extends SimpleApplication {
         ball_phy.setLinearVelocity(cam.getDirection().mult(25));
     }
 
+    BitmapText ch;
     /** A plus sign used as crosshairs to help the player with aiming. */
     protected void initCrossHairs() {
-        // setDisplayStatView(false);
-        // // guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
-        // BitmapText ch = new BitmapText(guiFont);
-        // ch.setSize(guiFont.getCharSet().getRenderedSize() * 2);
-        // ch.setText("+"); // fake crosshairs :)
-        // ch.setLocalTranslation( // center
-        //         settings.getWidth() / 2, settings.getHeight() / 2, 0);
-        // guiNode.attachChild(ch);
+        setDisplayStatView(false);
+        // guiFont = assetManager.loadFont("Interface/Fonts/Default.fnt");
+        ch = new BitmapText(guiFont);
+        ch.setSize(guiFont.getCharSet().getRenderedSize() * 2);
+        ch.setText("+"); // fake crosshairs :)
+       
+        guiNode.attachChild(ch);
+    }
+
+    protected void updateCrossHair() {
+         ch.setLocalTranslation( // center
+                settings.getWidth() / 2, settings.getHeight() / 2, 0);
     }
 }

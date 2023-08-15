@@ -31,14 +31,14 @@ public class TeaJSONArray extends TeaJSONElement implements JsonArray {
 
             @Override
             public JsonElement next() {
-                return new TeaJSONElement(arr().get(i++));
+                return new TeaJSONElement((org.teavm.jso.JSObject)arr().get(i++));
             }
         };
     }
 
     @Override
     public JsonElement get(int i) {
-        return new TeaJSONElement(arr().get(i));
+        return new TeaJSONElement((org.teavm.jso.JSObject)arr().get(i));
     }
 
     @Override

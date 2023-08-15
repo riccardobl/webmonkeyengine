@@ -10,7 +10,7 @@ import org.teavm.jso.JSObject;
 import org.teavm.jso.typedarrays.Int8Array;
 
 @JSFunctor
-interface ResourcePreloadCallback extends JSObject {
+interface ResourcePrefetchCallback extends JSObject {
     public void call(boolean b);
 }
 @JSFunctor
@@ -25,12 +25,12 @@ interface ResourceIndexCallback extends JSObject {
 
 class WebResourceLoaderWrapper {
     @Async
-    static native boolean jmeResourcesPreload();
-    static void jmeResourcesPreload(AsyncCallback<Boolean> callback){
-       jmeResourcesPreloadAsync((b)->callback.complete(b));
+    static native boolean jmeResourcesPrefetch();
+    static void jmeResourcesPrefetch(AsyncCallback<Boolean> callback){
+       jmeResourcesPrefetchAsync((b)->callback.complete(b));
     }
-     @JSBody(params = {"callback"}, script = "window.jme.resources.preload(callback);")
-    static native void jmeResourcesPreloadAsync(ResourcePreloadCallback callback);
+     @JSBody(params = {"callback"}, script = "window.jme.resources.prefetch(callback);")
+    static native void jmeResourcesPrefetchAsync(ResourcePrefetchCallback callback);
  
     @Async
     static native Int8Array jmeResourcesGetEntry(String name);
