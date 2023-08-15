@@ -1,21 +1,24 @@
-import java.security.MessageDigest
-import java.nio.file.Files
-import java.nio.file.Paths
+
 plugins {
     id "java"
     id "war"
-    id "org.teavm" version "0.8.1"
-    id "io.github.0ffz.github-packages" version "1.2.1"
-
+    id "wf.frk.teavm" version "0.8.1-jme"
 }
+
+import java.security.MessageDigest
+import java.nio.file.Files
+import java.nio.file.Paths
+def teaVM_VERSION="0.8.1-jme"
+def teaVM_GROUPS="wf.frk.teavm"
+
 configurations {
     compileOnlyWithResources {
         canBeResolved = true
     }
 }
 repositories {
+    maven { url "https://repo.repsy.io/mvn/riccardobl/jme3-teavm" }
     mavenCentral()
-        maven githubPackage.invoke("riccardobl")
 }
 
 
@@ -40,14 +43,15 @@ dependencies {
 
     // api (project(':jme3-jbullet'))
 
-    api "org.teavm:teavm-tooling:0.8.1"
-    api "org.teavm:teavm-core:0.8.1"
-    api "org.teavm:teavm-classlib:0.8.1"
+    implementation "${teaVM_GROUPS}:teavm-tooling:$teaVM_VERSION"
+    implementation "${teaVM_GROUPS}:teavm-core:$teaVM_VERSION"
+    implementation "${teaVM_GROUPS}:teavm-classlib:$teaVM_VERSION"
     // api 'javax.vecmath:vecmath:1.5.2'
-
-    implementation teavm.libs.jsoApis
-    implementation teavm.libs.jso
-    implementation teavm.libs.metaprogramming
+    implementation "${teaVM_GROUPS}:teavm-classlib:$teaVM_VERSION"
+    implementation "${teaVM_GROUPS}:teavm-jso-apis:$teaVM_VERSION"
+    implementation "${teaVM_GROUPS}:teavm-jso:$teaVM_VERSION"
+    implementation "${teaVM_GROUPS}:teavm-metaprogramming-api:$teaVM_VERSION"
+ 
 }
 
 

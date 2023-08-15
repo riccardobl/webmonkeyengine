@@ -1,3 +1,9 @@
+pluginManagement {  
+  repositories {      
+    gradlePluginPortal()
+        maven { url "https://repo.repsy.io/mvn/riccardobl/jme3-teavm" }
+    }
+}
 /**
  * This is the global settings file used by all subprojects.
  **/
