@@ -293,7 +293,7 @@ public class WebContext implements JmeContext, Runnable {
     @Override
     public void setTitle(String title) {
         Window.current().setName(title);
-        
+        Window.current().getDocument().setTitle(title);        
     }
 
     public void create() {
