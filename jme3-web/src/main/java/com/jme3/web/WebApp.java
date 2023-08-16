@@ -2,9 +2,12 @@ package com.jme3.web;
 
 import java.lang.reflect.InvocationTargetException;
 
+import com.jme3.app.DebugKeysAppState;
 import com.jme3.app.FlyCamAppState;
 import com.jme3.app.SimpleApplication;
+import com.jme3.app.StatsAppState;
 import com.jme3.app.state.AppState;
+import com.jme3.app.state.ConstantVerifierState;
 import com.jme3.audio.AudioListenerState;
 import com.jme3.system.AppSettings;
 import com.jme3.system.JmeSystem;
@@ -39,7 +42,11 @@ public class WebApp {
         settings.setFullscreen(false);
         
 
-        AppState appStates[] = { new FlyCamAppState(), new AudioListenerState() };
+        AppState appStates[] = {
+
+            new StatsAppState(), new FlyCamAppState(), new AudioListenerState(), new DebugKeysAppState(),
+                new ConstantVerifierState()
+         };
 
         SimpleApplication app = null;
 
