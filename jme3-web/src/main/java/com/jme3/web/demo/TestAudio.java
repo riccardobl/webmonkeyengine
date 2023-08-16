@@ -44,7 +44,7 @@ public class TestAudio extends SimpleApplication {
   private void initAudio() {
     /* gun shot sound is to be triggered by a mouse click. */
     audio_gun = new AudioNode(assetManager, 
-            "Sound/Effects/Gun2.ogg", DataType.Buffer);
+            "Sound/Effects/Gun.ogg", DataType.Buffer);
     audio_gun.setPositional(false);
     audio_gun.setLooping(false);
     audio_gun.setVolume(0.5f);
@@ -52,7 +52,7 @@ public class TestAudio extends SimpleApplication {
 
     /* nature sound - keeps playing in a loop. */
     AudioNode audio_nature = new AudioNode(assetManager, 
-            "Sound/Environment/Ocean Waves2.ogg", DataType.Buffer);
+            "Sound/Environment/Ocean Waves.ogg", DataType.Buffer);
     audio_nature.setLooping(true);  // activate continuous playing
     audio_nature.setPositional(true);   
     audio_nature.setVolume(1);
