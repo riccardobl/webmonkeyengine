@@ -40,6 +40,7 @@ public class WebAudioRenderer implements AudioRenderer {
     private ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
     private AtomicInteger bufferId = new AtomicInteger(1);
     private Map<Integer, AudioBuffer> buffersMap = new HashMap<>();
+    private static final int SAMPLE_RATE=44100;
 
 
     @Override
@@ -48,7 +49,7 @@ public class WebAudioRenderer implements AudioRenderer {
 
     private static class AudioEntry {
         private AudioBufferSourceNode _node;
-        private AudioContext _ctx;
+        private WebAudioContext _ctx;
         private boolean loop = false;
         private boolean nodeStarted = false;
         
@@ -60,20 +61,9 @@ public class WebAudioRenderer implements AudioRenderer {
 
         double duration;
         AudioBuffer buffer;
-        boolean positional=true;
-
+        boolean positional = true;
+ 
         public AudioBufferSourceNode getNode(){//boolean rebuild) {
-            // if (rebuild && _node != null) {
-            //     if (nodeStarted) {
-            //         time = _node.getPlaybackRate().getValue() * duration;
-            //     }
-            //     _node.stop(0);
-            //     _node.disconnect();
-            //     panner.disconnect();
-            //     gain.disconnect();
-            //     _node = null;
-            // }
-            
             if (_node == null) {
                 _node = getContext().createBufferSource();
                 _node.setBuffer(buffer);
@@ -83,25 +73,18 @@ public class WebAudioRenderer implements AudioRenderer {
                     reconnectStatic();
                 }
             }
-
-            // if (rebuild && _node != null && nodeStarted) {
-            //      _node.setLoopStart(0);
-            //     _node.setLoopEnd(duration);
-            //     _node.setLoop(loop);
-            //     _node.start(0, time);
-            // }
-
             return _node;
 
         }
         
-        // public AudioBufferSourceNode getNode() {
-        //     return getNode(false);
-        // }
-
-
-        public AudioContext getContext() {
-            if(_ctx==null)   _ctx = AudioContext.create();
+        public WebAudioContext getContext() {
+             
+            if(_ctx==null)   {
+                WebAudioContextOptions options=WebAudioContextOptions.create();
+                options.setSampleRate(SAMPLE_RATE);
+                options.setLatencyHint("interactive");
+                _ctx = WebAudioContext.create(options);
+            }
             return _ctx;
         }
 
@@ -175,30 +158,36 @@ public class WebAudioRenderer implements AudioRenderer {
     private AudioBuffer updateAudioData(AudioEntry entry, AudioData data) {
         if (data.isUpdateNeeded() || data.getId() == NativeObject.INVALID_ID) {
             int id = NativeObject.INVALID_ID;
-            while (id == NativeObject.INVALID_ID || id == 0) {
+            while (id == NativeObject.INVALID_ID) {
                 id = bufferId.incrementAndGet();
                 if (buffersMap.containsKey(id)) id = NativeObject.INVALID_ID;
             }
+            
             int numOfChannels = data.getChannels();
-            int length = (int) (data.getDuration() * data.getSampleRate());
-            int sampleRate=data.getSampleRate();
-            logger.log(Level.FINE, "Create web audio buffer. channels={0} sampleRate={1} duration={2}", new Object[] { numOfChannels,sampleRate,length });
-            AudioBuffer buffer = entry.getContext().createBuffer(numOfChannels, length, sampleRate);
+            WebAudioContext ctx = entry.getContext();
+            int lengthInSamples = (int) (data.getDuration() * ctx.getSampleRate());
+
+            logger.log(Level.FINE, "Create web audio buffer. channels={0} sampleRate={1} duration={2}", new Object[] { numOfChannels, ctx.getSampleRate(),lengthInSamples });
+            AudioBuffer buffer = entry.getContext().createBuffer(numOfChannels, lengthInSamples,  ctx.getSampleRate());
+         
             if (data instanceof AudioStream) {
-                updateAudioStream((AudioStream) data, buffer);
+                updateAudioStream((AudioStream) data, buffer, data.getSampleRate(), (int)ctx.getSampleRate(),lengthInSamples);
             } else if (data instanceof com.jme3.audio.AudioBuffer) {
-                updateBufferStream((com.jme3.audio.AudioBuffer) data, buffer);
+                updateBufferStream((com.jme3.audio.AudioBuffer) data, buffer,data.getSampleRate(), (int)ctx.getSampleRate(),lengthInSamples);
             }
 
-            buffersMap.put(id, buffer);
+            
             data.setId(id);
             data.clearUpdateNeeded();
+
+            buffersMap.put(id, buffer);
 
             return buffer;
         } else {
             return buffersMap.get(data.getId());
         }
     }
+ 
 
     private void swapOrder(byte[] bytes) {
         for (int i = 0; i < bytes.length; i += 2) {
@@ -208,70 +197,91 @@ public class WebAudioRenderer implements AudioRenderer {
         }
     }
 
-    private void audioDataToF32(AudioData ab, ByteBuffer in,  Float32Array outs[]) {
-        int bps = ab.getBitsPerSample();
-        int inc = bps / 8;
-        int channels = ab.getChannels();
-        byte channelSample[] = new byte[inc];
-        boolean swapOrder = in.order() != ByteOrder.LITTLE_ENDIAN;
-        int j = 0;
-        for (int i = 0; i < in.limit(); i += inc * channels) {
-            for (int c = 0; c < channels; c++) { // interleaved
-                Float32Array out = outs[c];
-                in.get(channelSample);
-                if (swapOrder) swapOrder(channelSample);
-                if (bps == 8) {
-                    int n = channelSample[0];
-                    float fbe;
-                    if (n < 0) {
-                        fbe = (float) n / 128f;
-                    } else {
-                        fbe = (float) n / 127f; 
-                    }
-                    out.set(j, fbe);
-                } else if (bps == 16) {
-                    short sbe = (short) ((channelSample[1] & 0xFF) << 8 | (channelSample[0] & 0xFF)); 
-                    float fbe;
-                    if (sbe < 0) {
-                        fbe = (float) sbe / 32768f;
-                    } else {
-                        fbe = (float) sbe / 32767f;
-                    }
-                    out.set(j, fbe);
-                } else if (bps == 24) {
-                    int ibe = (int) ((channelSample[2] & 0xFF) << 16 | (channelSample[1] & 0xFF) << 8 | (channelSample[0] & 0xFF));
-                    // Extend sign to int32
-                    if ((ibe & 0x00800000) > 0) ibe |= 0xFF000000;
-
-                    float fbe;
-                    if (ibe < 0) {
-                        fbe = (float) ibe / 8388608f;
-                    } else {
-                        fbe = (float) ibe / 8388607f;
-                    }
-                    out.set(j, fbe);
-                } else {
-                    throw new UnsupportedOperationException("Unsupported bits per sample: " + bps);
-                }
-
+    private void write(byte[] channelSample, int j, int bps, boolean swapOrder,  Float32Array out ) {
+        if (swapOrder) swapOrder(channelSample);
+        double dcOffset = 1e-6;
+        if (bps == 8) {
+            int n = channelSample[0];
+            float fbe;
+            if (n < 0) {
+                fbe = (float)((((double) n)-dcOffset) / 128.);
+            } else {
+                fbe = (float)((((double) n)+dcOffset) / 127.);
             }
-            j++;
+            out.set(j, fbe);
+        } else if (bps == 16) {
+            short sbe = (short) ((channelSample[1] & 0xFF) << 8 | (channelSample[0] & 0xFF));
+            float fbe;
+            if (sbe < 0) {
+                fbe = (float) ((((double)sbe)-dcOffset) / 32768.);
+            } else {
+                fbe = (float) ((((double)sbe)+dcOffset) / 32767.);
+            }
+            out.set(j, fbe);
+        } else if (bps == 24) {
+            int ibe = (int) ((channelSample[2] & 0xFF) << 16 | (channelSample[1] & 0xFF) << 8 | (channelSample[0] & 0xFF));
+            // Extend sign to int32
+            if ((ibe & 0x00800000) > 0) ibe |= 0xFF000000;
+
+            float fbe;
+            if (ibe < 0) {
+                fbe = (float) ((((double)ibe)-dcOffset) / 8388608.);
+            } else {
+                fbe = (float) ((((double)ibe)+dcOffset) / 8388607.);
+            }
+            out.set(j, fbe);
+        } else {
+            throw new UnsupportedOperationException("Unsupported bits per sample: " + bps);
         }
+    }
+
+    private void audioDataToF32(AudioData ab, ByteBuffer in, Float32Array outs[],int srcSampleRate, int dstSampleRate) {
+        int bps = ab.getBitsPerSample();
+        int channels = ab.getChannels();
+        byte channelSample[] = new byte[bps/8];
+        boolean swapOrder = in.order() != ByteOrder.nativeOrder();
+
+        double samplePos = 0;
+        double sampleInc = (double)srcSampleRate /(double) dstSampleRate;
+ 
+        for (int outPos = 0; outPos < outs[0].getLength();outPos++) {
+            for (int c = 0; c < channels; c++) { // interleaved
+                
+                int pos = (int) (samplePos) * channels * channelSample.length;
+                pos += c * channelSample.length;
+                
+                in.position(pos);
+                in.get(channelSample);
+
+                write(channelSample, outPos, bps, swapOrder, outs[c]);
+            }
+            samplePos += sampleInc;
+        }
+    }
+
+    private void updateAudioStream(AudioStream ab, AudioBuffer buffer, int srcSampleRate, int destSampleRate, int lengthInSamples) {
+        ByteBuffer inputData = ByteBuffer.allocateDirect(lengthInSamples* (ab.getBitsPerSample()/8));
+        byte chunk[] = new byte[1024];
+        int read = 0;
+        while ((read = ab.readSamples(chunk)) > 0) {
+            inputData.put(chunk, 0, read);
+        }
+        inputData.rewind();
+        Float32Array data[] = new Float32Array[ab.getChannels()];
+        for (int i = 0; i < ab.getChannels(); i++) data[i] = Float32Array.create(lengthInSamples);
+        audioDataToF32(ab, inputData, data,srcSampleRate,destSampleRate);
+        for (int i = 0; i < ab.getChannels(); i++) buffer.copyToChannel(data[i], i, 0);
+        inputData.rewind();
 
     }
 
-    private void updateAudioStream(AudioStream ab, AudioBuffer buffer) {
-        throw new UnsupportedOperationException("AudioStream are not supported yet.");
-    }
-
-    private void updateBufferStream(com.jme3.audio.AudioBuffer ab, AudioBuffer buffer) {
+    private void updateBufferStream(com.jme3.audio.AudioBuffer ab, AudioBuffer buffer, int srcSampleRate, int destSampleRate, int lengthInSamples) {
         ByteBuffer inputData = ab.getData();
         inputData.rewind();
         Float32Array data[] = new Float32Array[ab.getChannels()];
-        for (int i = 0; i < ab.getChannels(); i++) data[i] = Float32Array.create(buffer.getLength());
-        audioDataToF32(ab, inputData, data);
+        for (int i = 0; i < ab.getChannels(); i++) data[i] = Float32Array.create(lengthInSamples);
+        audioDataToF32(ab, inputData, data,srcSampleRate,destSampleRate);
         for (int i = 0; i < ab.getChannels(); i++) buffer.copyToChannel(data[i], i, 0);
-
         inputData.rewind();
     }
 
@@ -299,16 +309,16 @@ public class WebAudioRenderer implements AudioRenderer {
         if (nodes == null) {
             nodes = new ArrayList<>();
             howlers.put(src, nodes);
-        } else {
-            if (index == -1) index = nodes.size();
-            if (nodes.size() > index) entry = nodes.get(index);
-        }
+        }  
+        
+        
+        if (index == -1) index = nodes.size();
+        if (nodes.size() > index) entry = nodes.get(index);
+        
 
         if (entry == null) {
-            entry = new AudioEntry();
-            
-            AudioBuffer buff = updateAudioData(entry, src.getAudioData());
-            
+            entry = new AudioEntry();            
+            AudioBuffer buff = updateAudioData(entry, src.getAudioData());            
             while (nodes.size() <= index) nodes.add(null);
             entry.buffer = buff;
             entry.duration=src.getAudioData().getDuration();
@@ -317,16 +327,10 @@ public class WebAudioRenderer implements AudioRenderer {
             entry.channel = index;
             entry.time = src.getTimeOffset();
             nodes.set(index, entry);
-
             entry.getNode();
-            
-          
-            // if (src.isPositional()) entry.reconnectPositional();
-            // else entry.reconnectStatic();
         } else {
             updateAudioData(entry,src.getAudioData());
         }
-
         return entry;
     }
 

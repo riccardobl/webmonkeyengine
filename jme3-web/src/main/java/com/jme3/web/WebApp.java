@@ -13,6 +13,7 @@ import com.jme3.web.context.HeapAllocator;
 import com.jme3.web.context.JmeWebSystem;
 import com.jme3.web.context.NativeUtils;
 import com.jme3.web.demo.TestShadows;
+import com.jme3.web.demo.TestAudio;
 import com.jme3.web.demo.TestPBRSimple;
 import com.jme3.web.demo.TestPhysics;
 
@@ -50,10 +51,11 @@ public class WebApp {
             case "shadows":
                 app = new TestShadows(appStates);
                 break;
-
             case "physics":
                 app = new TestPhysics(appStates);
-
+                break;
+            case "audio":
+                app = new TestAudio(appStates);
                 break;
         }
 
