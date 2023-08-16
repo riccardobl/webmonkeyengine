@@ -283,9 +283,7 @@ public class BulletDebugAppState extends AbstractAppState {
                 if (filter == null || filter.displayObject(physicsObject)) {
                     logger.log(Level.FINE, "Create new debug RigidBody");
                     //create new spatial
-                    System.out.println("A");
                     Node node = new Node(physicsObject.toString());
-                    System.out.println("B");
                     node.addControl(new BulletRigidBodyDebugControl(this, physicsObject));
                     bodies.put(physicsObject, node);
                     physicsDebugRootNode.attachChild(node);

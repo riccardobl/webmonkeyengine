@@ -9,8 +9,6 @@ import java.nio.ByteBuffer;
 
 import org.nothings.stb.image.ColorComponents;
 import org.nothings.stb.image.ImageResult;
-import org.nothings.stb.image.decoding.Decoder;
-
 import com.jme3.asset.AssetInfo;
 import com.jme3.asset.AssetLoader;
 import com.jme3.texture.Image;
