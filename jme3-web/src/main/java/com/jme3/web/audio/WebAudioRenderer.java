@@ -189,17 +189,17 @@ public class WebAudioRenderer implements AudioRenderer {
     }
  
 
-    private void swapOrder(byte[] bytes) {
-        for (int i = 0; i < bytes.length; i += 2) {
-            byte b = bytes[i];
-            bytes[i] = bytes[i + 1];
-            bytes[i + 1] = b;
+    private void reverseOrder(byte[] bytes) {
+        for (int i = 0; i < bytes.length / 2; i++) {
+            byte temp = bytes[i];
+            bytes[i] = bytes[bytes.length - i - 1];
+            bytes[bytes.length - i - 1] = temp;
         }
     }
 
     private void write(byte[] channelSample, int j, int bps, boolean swapOrder,  Float32Array out ) {
-        if (swapOrder) swapOrder(channelSample);
-        double dcOffset = 1e-6;
+        if (swapOrder) reverseOrder(channelSample);
+        double dcOffset = 0;
         if (bps == 8) {
             int n = channelSample[0];
             float fbe;
