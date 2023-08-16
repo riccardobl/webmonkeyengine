@@ -20,7 +20,6 @@ import com.jme3.web.demo.TestInstancing;
 import com.jme3.web.demo.TestAudio;
 import com.jme3.web.demo.TestPBRSimple;
 import com.jme3.web.demo.TestPhysics;
-import com.jme3.web.demo.TestRagdoll;
 
 public class WebApp {
 
