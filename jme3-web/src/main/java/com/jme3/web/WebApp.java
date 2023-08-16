@@ -16,9 +16,11 @@ import com.jme3.web.context.HeapAllocator;
 import com.jme3.web.context.JmeWebSystem;
 import com.jme3.web.context.NativeUtils;
 import com.jme3.web.demo.TestShadows;
+import com.jme3.web.demo.TestInstancing;
 import com.jme3.web.demo.TestAudio;
 import com.jme3.web.demo.TestPBRSimple;
 import com.jme3.web.demo.TestPhysics;
+import com.jme3.web.demo.TestRagdoll;
 
 public class WebApp {
 
@@ -64,6 +66,10 @@ public class WebApp {
             case "audio":
                 app = new TestAudio(appStates);
                 break;
+            case "inst":
+                app = new TestInstancing(appStates);
+                break;
+      
         }
 
         app.setSettings(settings);
