@@ -1,31 +1,22 @@
 package com.jme3.web.filesystem;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLStreamHandler;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.teavm.jso.JSBody;
 import org.teavm.jso.browser.Window;
-import org.teavm.jso.typedarrays.Int8Array;
-
 import com.jme3.util.res.ResourcesLoaderImpl;
 
 public class WebResourceLoaderImplNoCache implements ResourcesLoaderImpl {
     private static final Logger logger = Logger.getLogger(WebResourceLoaderImplNoCache.class.getName());
-    private volatile byte preloadStatus = -1;
-
+ 
     public WebResourceLoaderImplNoCache() {
       
           
@@ -50,8 +41,7 @@ public class WebResourceLoaderImplNoCache implements ResourcesLoaderImpl {
     @Override
     public URL getResource(String path, Class<?> clazz) {
         try{
-            path = getFullPath(clazz, path);
-            
+            path = getFullPath(clazz, path);            
             return new URL(path);
         } catch (Exception e) {
             e.printStackTrace();
@@ -66,20 +56,47 @@ public class WebResourceLoaderImplNoCache implements ResourcesLoaderImpl {
         try {
             return url.openConnection().getInputStream();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return null;
     }
 
+    protected ArrayList<URL> index;
+
     @Override
     public Enumeration<URL> getResources(String path, Class<?> clazz) throws IOException {
-        URL url = getResource(path, clazz);
-        if (url == null) {
-            return Collections.emptyEnumeration();
-        } else {
-            return Collections.enumeration(Collections.singletonList(url));
+        if (index == null) {
+            String indexPath=this.getFullPath(clazz, "resourcesIndex.txt");
+            URL url=new URL(indexPath);
+            try {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int len;
+                InputStream is = url.openStream();
+                while ((len = is.read(buffer)) > -1 ) {
+                    baos.write(buffer, 0, len);
+                }
+                baos.flush();
+                String content = new String(baos.toByteArray(), Charset.forName("UTF-8"));
+                String[] lines = content.split("\n");
+                index = new ArrayList<URL>();
+                for (String line : lines) {
+                    line = line.trim();
+                    String[] parts=line.split(" ",1);
+                    if(parts.length==2){
+                        String hash=parts[0].trim(); // useless
+                        String resource=parts[1].trim();
+                        if (resource.length() > 0 ) {
+                            URL url2 = getResource(line, clazz);
+                            index.add(url2);
+                        }
+                    }
+                } 
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+        return Collections.enumeration(index.stream().filter(f -> f.toString().endsWith(path)).collect(java.util.stream.Collectors.toList()));
     }
 
 }
