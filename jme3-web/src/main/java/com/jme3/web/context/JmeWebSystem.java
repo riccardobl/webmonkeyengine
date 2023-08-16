@@ -43,6 +43,7 @@ import com.jme3.util.BufferAllocatorFactory;
 import com.jme3.util.res.ResourcesLoader;
 import com.jme3.web.audio.WebAudioRenderer;
 import com.jme3.web.filesystem.WebResourceLoaderImpl;
+import com.jme3.web.filesystem.WebResourceLoaderImplNoCache;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -56,7 +57,7 @@ public class JmeWebSystem extends JmeSystemDelegate {
     public JmeWebSystem() {
         super();
         if (System.getProperty(ResourcesLoader.PROPERTY_RESOURCES_LOADER_IMPLEMENTATION) == null) {
-            System.setProperty(ResourcesLoader.PROPERTY_RESOURCES_LOADER_IMPLEMENTATION, WebResourceLoaderImpl.class.getName());
+            System.setProperty(ResourcesLoader.PROPERTY_RESOURCES_LOADER_IMPLEMENTATION, WebResourceLoaderImplNoCache.class.getName());
         }
         if (System.getProperty(Json.PROPERTY_JSON_PARSER_IMPLEMENTATION) == null) {
             System.setProperty(Json.PROPERTY_JSON_PARSER_IMPLEMENTATION, TeaJSONParser.class.getName());

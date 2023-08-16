@@ -34,6 +34,7 @@ import com.jme3.util.SafeArrayList;
 import com.jme3.util.clone.JmeCloneable;
 import com.jme3.web.context.HeapAllocator;
 import com.jme3.web.filesystem.WebResourceLoaderImpl;
+import com.jme3.web.filesystem.WebResourceLoaderImplNoCache;
 import com.jme3.json.*;
 
 public class TeaReflectionSupplier implements ReflectionSupplier {
@@ -61,6 +62,7 @@ public class TeaReflectionSupplier implements ReflectionSupplier {
         TeaReflectionSupplier.addReflectionClass(HeapAllocator.class);
         TeaReflectionSupplier.addReflectionClass(TeaJSONParser.class);
         TeaReflectionSupplier.addReflectionClass(WebResourceLoaderImpl.class);
+        TeaReflectionSupplier.addReflectionClass(WebResourceLoaderImplNoCache.class);
 
         // TeaReflectionSupplier.addReflectionClass(GenericConstraint.class);
         // TeaReflectionSupplier.addReflectionClass(AnimControl.class);
