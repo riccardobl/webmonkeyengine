@@ -126,7 +126,7 @@ public class WebGL implements GL, GL2, GLES_30, GLExt, GLFbo {
             //   this.debugExt.disable();
         }
 
-        gl.disable(WebGLRenderingContext.DITHER);
+        gl.enable(WebGLRenderingContext.DITHER);
 
 
         // enableExtension("WEBGL_compressed_texture_pvrtc");
