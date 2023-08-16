@@ -1,4 +1,7 @@
+
 dependencies {
     api project(':jme3-core')
-    api 'com.github.stephengold:j-ogg-vorbis:1.0.3'
+    // api 'com.github.stephengold:j-ogg-vorbis:1.0.3'
+    implementation 'com.github.riccardobl.j-ogg-all:j-ogg-vorbis:-SNAPSHOT'
+    
 }
