@@ -31,6 +31,7 @@
  */
 package com.jme3.collision;
 
+import com.jme3.math.FastMath;
 import com.jme3.math.Triangle;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
@@ -99,7 +100,7 @@ public class CollisionResult implements Comparable<CollisionResult> {
 
     @Override
     public int compareTo(CollisionResult other) {
-        return Float.compare(distance, other.distance);
+        return FastMath.compare(distance, other.distance);
     }
 
     @Override

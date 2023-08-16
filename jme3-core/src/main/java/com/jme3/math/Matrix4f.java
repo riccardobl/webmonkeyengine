@@ -2251,55 +2251,55 @@ public final class Matrix4f implements Savable, Cloneable, java.io.Serializable 
         }
 
         Matrix4f comp = (Matrix4f) o;
-        if (Float.compare(m00, comp.m00) != 0) {
+        if (FastMath.compare(m00, comp.m00) != 0) {
             return false;
         }
-        if (Float.compare(m01, comp.m01) != 0) {
+        if (FastMath.compare(m01, comp.m01) != 0) {
             return false;
         }
-        if (Float.compare(m02, comp.m02) != 0) {
+        if (FastMath.compare(m02, comp.m02) != 0) {
             return false;
         }
-        if (Float.compare(m03, comp.m03) != 0) {
-            return false;
-        }
-
-        if (Float.compare(m10, comp.m10) != 0) {
-            return false;
-        }
-        if (Float.compare(m11, comp.m11) != 0) {
-            return false;
-        }
-        if (Float.compare(m12, comp.m12) != 0) {
-            return false;
-        }
-        if (Float.compare(m13, comp.m13) != 0) {
+        if (FastMath.compare(m03, comp.m03) != 0) {
             return false;
         }
 
-        if (Float.compare(m20, comp.m20) != 0) {
+        if (FastMath.compare(m10, comp.m10) != 0) {
             return false;
         }
-        if (Float.compare(m21, comp.m21) != 0) {
+        if (FastMath.compare(m11, comp.m11) != 0) {
             return false;
         }
-        if (Float.compare(m22, comp.m22) != 0) {
+        if (FastMath.compare(m12, comp.m12) != 0) {
             return false;
         }
-        if (Float.compare(m23, comp.m23) != 0) {
+        if (FastMath.compare(m13, comp.m13) != 0) {
             return false;
         }
 
-        if (Float.compare(m30, comp.m30) != 0) {
+        if (FastMath.compare(m20, comp.m20) != 0) {
             return false;
         }
-        if (Float.compare(m31, comp.m31) != 0) {
+        if (FastMath.compare(m21, comp.m21) != 0) {
             return false;
         }
-        if (Float.compare(m32, comp.m32) != 0) {
+        if (FastMath.compare(m22, comp.m22) != 0) {
             return false;
         }
-        if (Float.compare(m33, comp.m33) != 0) {
+        if (FastMath.compare(m23, comp.m23) != 0) {
+            return false;
+        }
+
+        if (FastMath.compare(m30, comp.m30) != 0) {
+            return false;
+        }
+        if (FastMath.compare(m31, comp.m31) != 0) {
+            return false;
+        }
+        if (FastMath.compare(m32, comp.m32) != 0) {
+            return false;
+        }
+        if (FastMath.compare(m33, comp.m33) != 0) {
             return false;
         }
 
@@ -2474,55 +2474,55 @@ public final class Matrix4f implements Savable, Cloneable, java.io.Serializable 
             return false;
         }
 
-        if (Float.compare(Math.abs(other.m00 - m00), epsilon) > 0) {
+        if (FastMath.compare(Math.abs(other.m00 - m00), epsilon) > 0) {
             return false;
         }
-        if (Float.compare(Math.abs(other.m01 - m01), epsilon) > 0) {
+        if (FastMath.compare(Math.abs(other.m01 - m01), epsilon) > 0) {
             return false;
         }
-        if (Float.compare(Math.abs(other.m02 - m02), epsilon) > 0) {
+        if (FastMath.compare(Math.abs(other.m02 - m02), epsilon) > 0) {
             return false;
         }
-        if (Float.compare(Math.abs(other.m03 - m03), epsilon) > 0) {
-            return false;
-        }
-
-        if (Float.compare(Math.abs(other.m10 - m10), epsilon) > 0) {
-            return false;
-        }
-        if (Float.compare(Math.abs(other.m11 - m11), epsilon) > 0) {
-            return false;
-        }
-        if (Float.compare(Math.abs(other.m12 - m12), epsilon) > 0) {
-            return false;
-        }
-        if (Float.compare(Math.abs(other.m13 - m13), epsilon) > 0) {
+        if (FastMath.compare(Math.abs(other.m03 - m03), epsilon) > 0) {
             return false;
         }
 
-        if (Float.compare(Math.abs(other.m20 - m20), epsilon) > 0) {
+        if (FastMath.compare(Math.abs(other.m10 - m10), epsilon) > 0) {
             return false;
         }
-        if (Float.compare(Math.abs(other.m21 - m21), epsilon) > 0) {
+        if (FastMath.compare(Math.abs(other.m11 - m11), epsilon) > 0) {
             return false;
         }
-        if (Float.compare(Math.abs(other.m22 - m22), epsilon) > 0) {
+        if (FastMath.compare(Math.abs(other.m12 - m12), epsilon) > 0) {
             return false;
         }
-        if (Float.compare(Math.abs(other.m23 - m23), epsilon) > 0) {
+        if (FastMath.compare(Math.abs(other.m13 - m13), epsilon) > 0) {
             return false;
         }
 
-        if (Float.compare(Math.abs(other.m30 - m30), epsilon) > 0) {
+        if (FastMath.compare(Math.abs(other.m20 - m20), epsilon) > 0) {
             return false;
         }
-        if (Float.compare(Math.abs(other.m31 - m31), epsilon) > 0) {
+        if (FastMath.compare(Math.abs(other.m21 - m21), epsilon) > 0) {
             return false;
         }
-        if (Float.compare(Math.abs(other.m32 - m32), epsilon) > 0) {
+        if (FastMath.compare(Math.abs(other.m22 - m22), epsilon) > 0) {
             return false;
         }
-        if (Float.compare(Math.abs(other.m33 - m33), epsilon) > 0) {
+        if (FastMath.compare(Math.abs(other.m23 - m23), epsilon) > 0) {
+            return false;
+        }
+
+        if (FastMath.compare(Math.abs(other.m30 - m30), epsilon) > 0) {
+            return false;
+        }
+        if (FastMath.compare(Math.abs(other.m31 - m31), epsilon) > 0) {
+            return false;
+        }
+        if (FastMath.compare(Math.abs(other.m32 - m32), epsilon) > 0) {
+            return false;
+        }
+        if (FastMath.compare(Math.abs(other.m33 - m33), epsilon) > 0) {
             return false;
         }
 

@@ -949,16 +949,16 @@ public final class Vector4f implements Savable, Cloneable, java.io.Serializable 
         }
 
         Vector4f comp = (Vector4f) o;
-        if (Float.compare(x, comp.x) != 0) {
+        if (FastMath.compare(x, comp.x) != 0) {
             return false;
         }
-        if (Float.compare(y, comp.y) != 0) {
+        if (FastMath.compare(y, comp.y) != 0) {
             return false;
         }
-        if (Float.compare(z, comp.z) != 0) {
+        if (FastMath.compare(z, comp.z) != 0) {
             return false;
         }
-        if (Float.compare(w, comp.w) != 0) {
+        if (FastMath.compare(w, comp.w) != 0) {
             return false;
         }
         return true;
@@ -976,16 +976,16 @@ public final class Vector4f implements Savable, Cloneable, java.io.Serializable 
         if (other == null) {
             return false;
         }
-        if (Float.compare(Math.abs(other.x - x), epsilon) > 0) {
+        if (FastMath.compare(Math.abs(other.x - x), epsilon) > 0) {
             return false;
         }
-        if (Float.compare(Math.abs(other.y - y), epsilon) > 0) {
+        if (FastMath.compare(Math.abs(other.y - y), epsilon) > 0) {
             return false;
         }
-        if (Float.compare(Math.abs(other.z - z), epsilon) > 0) {
+        if (FastMath.compare(Math.abs(other.z - z), epsilon) > 0) {
             return false;
         }
-        if (Float.compare(Math.abs(other.w - w), epsilon) > 0) {
+        if (FastMath.compare(Math.abs(other.w - w), epsilon) > 0) {
             return false;
         }
         return true;

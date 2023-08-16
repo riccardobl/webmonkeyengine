@@ -1135,4 +1135,22 @@ final public class FastMath {
     public static float unInterpolateLinear(float value, float min, float max) {
         return (value - min) / (max - min);
     }
+
+
+    /**
+     * Compares the two specified {@code float} values. 
+     *
+     * @param f1
+     *            the first {@code float} to compare.
+     * @param f2
+     *            the second {@code float} to compare.
+     * @return the value {@code 0} if {@code f1} is numerically equal to
+     *         {@code f2} or if both numbers are NaN; a value less than {@code 0} if {@code f1} is
+     *         numerically less than {@code f2}; and a value greater than
+     *         {@code 0} if {@code f1} is numerically greater than {@code f2}.
+     */
+    public static int compare(float f1, float f2) {
+        if (Float.isNaN(f1) && Float.isNaN(f2)) return 0;
+        return Float.compare(f1, f2);
+    }
 }

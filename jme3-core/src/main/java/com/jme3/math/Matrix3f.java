@@ -1262,33 +1262,33 @@ public final class Matrix3f implements Savable, Cloneable, java.io.Serializable 
         }
 
         Matrix3f comp = (Matrix3f) o;
-        if (Float.compare(m00, comp.m00) != 0) {
+        if (FastMath.compare(m00, comp.m00) != 0) {
             return false;
         }
-        if (Float.compare(m01, comp.m01) != 0) {
+        if (FastMath.compare(m01, comp.m01) != 0) {
             return false;
         }
-        if (Float.compare(m02, comp.m02) != 0) {
-            return false;
-        }
-
-        if (Float.compare(m10, comp.m10) != 0) {
-            return false;
-        }
-        if (Float.compare(m11, comp.m11) != 0) {
-            return false;
-        }
-        if (Float.compare(m12, comp.m12) != 0) {
+        if (FastMath.compare(m02, comp.m02) != 0) {
             return false;
         }
 
-        if (Float.compare(m20, comp.m20) != 0) {
+        if (FastMath.compare(m10, comp.m10) != 0) {
             return false;
         }
-        if (Float.compare(m21, comp.m21) != 0) {
+        if (FastMath.compare(m11, comp.m11) != 0) {
             return false;
         }
-        if (Float.compare(m22, comp.m22) != 0) {
+        if (FastMath.compare(m12, comp.m12) != 0) {
+            return false;
+        }
+
+        if (FastMath.compare(m20, comp.m20) != 0) {
+            return false;
+        }
+        if (FastMath.compare(m21, comp.m21) != 0) {
+            return false;
+        }
+        if (FastMath.compare(m22, comp.m22) != 0) {
             return false;
         }
 

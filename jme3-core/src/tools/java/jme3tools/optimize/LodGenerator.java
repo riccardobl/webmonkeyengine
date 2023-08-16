@@ -48,6 +48,7 @@
 package jme3tools.optimize;
 
 import com.jme3.bounding.BoundingSphere;
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
@@ -238,7 +239,7 @@ public class LodGenerator {
     final private Comparator<Vertex> collapseComparator = new Comparator<Vertex>() {
         @Override
         public int compare(Vertex o1, Vertex o2) {
-            if (Float.compare(o1.collapseCost, o2.collapseCost) == 0) {
+            if (FastMath.compare(o1.collapseCost, o2.collapseCost) == 0) {
                 return 0;
             }
             if (o1.collapseCost < o2.collapseCost) {
