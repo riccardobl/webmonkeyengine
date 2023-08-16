@@ -2,14 +2,14 @@
 plugins {
     id "java"
     id "war"
-    id "wf.frk.teavm" version "0.8.1-jme"
+    id "org.teavm" version "0.9.0-dev-10"
 }
 
 import java.security.MessageDigest
 import java.nio.file.Files
 import java.nio.file.Paths
-def teaVM_VERSION="0.8.1-jme"
-def teaVM_GROUPS="wf.frk.teavm"
+def teaVM_VERSION="0.9.0-dev-10"
+def teaVM_GROUPS="org.teavm"
 
 configurations {
     compileOnlyWithResources {
@@ -17,6 +17,7 @@ configurations {
     }
 }
 repositories {
+        maven { url = uri("https://teavm.org/maven/repository") }
     maven { url "https://repo.repsy.io/mvn/riccardobl/jme3-teavm" }
     mavenCentral()
 }
@@ -154,6 +155,10 @@ teavm.js {
          "**/DDSLoader.java",
 
         "**/BitmapFontLoader.java",
+        // "**/SkeletonLoader.java",
+        // "**/MaterialLoader.java",
+        // "**/SceneLoader.java",
+        // "**/MeshLoader.java",
 
 
     ]

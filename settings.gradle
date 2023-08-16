@@ -1,6 +1,7 @@
 pluginManagement {  
   repositories {      
     gradlePluginPortal()
+            maven { url = uri("https://teavm.org/maven/repository") }
         maven { url "https://repo.repsy.io/mvn/riccardobl/jme3-teavm" }
     }
 }
