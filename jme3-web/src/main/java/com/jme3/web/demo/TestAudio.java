@@ -5,6 +5,7 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AppState;
 import com.jme3.audio.AudioData.DataType;
 import com.jme3.audio.AudioNode;
+import com.jme3.audio.Environment;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.MouseButtonTrigger;
@@ -43,6 +44,7 @@ public class TestAudio extends SimpleApplication {
   /** We create two audio nodes. */
   private void initAudio() {
     /* gun shot sound is to be triggered by a mouse click. */
+    // audioRenderer.setEnvironment(Environment.Cavern);
     audio_gun = new AudioNode(assetManager, 
             "Sound/Effects/Gun.ogg", DataType.Buffer);
     audio_gun.setPositional(false);

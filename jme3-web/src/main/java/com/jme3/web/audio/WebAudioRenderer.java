@@ -1,5 +1,7 @@
 package com.jme3.web.audio;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -11,14 +13,16 @@ import java.util.WeakHashMap;
 import java.util.Map.Entry;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.teavm.jso.typedarrays.Float32Array;
+import org.teavm.jso.typedarrays.Int8Array;
 import org.teavm.jso.webaudio.AudioBuffer;
 import org.teavm.jso.webaudio.AudioBufferSourceNode;
-import org.teavm.jso.webaudio.AudioContext;
 import org.teavm.jso.webaudio.AudioListener;
+import org.teavm.jso.webaudio.ConvolverNode;
 import org.teavm.jso.webaudio.GainNode;
 import org.teavm.jso.webaudio.PannerNode;
 import com.jme3.audio.AudioData;
@@ -32,6 +36,7 @@ import com.jme3.audio.Listener;
 import com.jme3.audio.ListenerParam;
 import com.jme3.math.Vector3f;
 import com.jme3.util.NativeObject;
+import com.jme3.util.res.ResourcesLoader;
 
 public class WebAudioRenderer implements AudioRenderer {
     private Logger logger = Logger.getLogger(WebAudioRenderer.class.getName());
@@ -40,7 +45,8 @@ public class WebAudioRenderer implements AudioRenderer {
     private ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
     private AtomicInteger bufferId = new AtomicInteger(1);
     private Map<Integer, AudioBuffer> buffersMap = new HashMap<>();
-    private static final int SAMPLE_RATE=44100;
+    private static final int SAMPLE_RATE = 44100;
+    private Environment env;
 
 
     @Override
@@ -55,6 +61,7 @@ public class WebAudioRenderer implements AudioRenderer {
         
 
         PannerNode panner;
+        ConvolverNode convolver;
         GainNode gain;
         int channel = 0;
         double time = 0;
@@ -62,6 +69,19 @@ public class WebAudioRenderer implements AudioRenderer {
         double duration;
         AudioBuffer buffer;
         boolean positional = true;
+        int sampleRate = SAMPLE_RATE;
+        private Environment currentEnv;
+
+        public void setEnvironment(Environment env) {
+            if (env.equals(currentEnv)) return;
+            currentEnv = env;
+            if (positional) {
+                reconnectPositional();
+            }else {
+                reconnectStatic();
+            }
+            
+        }
  
         public AudioBufferSourceNode getNode(){//boolean rebuild) {
             if (_node == null) {
@@ -81,7 +101,7 @@ public class WebAudioRenderer implements AudioRenderer {
              
             if(_ctx==null)   {
                 WebAudioContextOptions options=WebAudioContextOptions.create();
-                options.setSampleRate(SAMPLE_RATE);
+                options.setSampleRate(sampleRate);
                 options.setLatencyHint("interactive");
                 _ctx = WebAudioContext.create(options);
             }
@@ -110,6 +130,7 @@ public class WebAudioRenderer implements AudioRenderer {
             node.stop(0);
             node.disconnect();
             panner.disconnect();
+            convolver.disconnect();
             gain.disconnect();
 
         }
@@ -131,14 +152,58 @@ public class WebAudioRenderer implements AudioRenderer {
         AudioEntry() {
         }
 
+
+        private void setupConvolver() {
+            WebAudioContext ctx = getContext();
+            String impulseName = "";
+            if (currentEnv == null) throw new RuntimeException("No environment set");
+            if (currentEnv == Environment.AcousticLab) {
+                impulseName = "Basement.m4a";
+            } else if (currentEnv == Environment.Cavern) {
+                impulseName = "EmptyApartmentBedroom.m4a";
+            } else if (currentEnv == Environment.Closet) {
+                impulseName = "Basement.m4a";
+            } else if (currentEnv == Environment.Dungeon) {
+                impulseName = "PurnodesRailroadTunnel.m4a";
+            } else if (currentEnv == Environment.Garage) {
+                impulseName = "Basement.m4a";
+            }
+            InputStream is = ResourcesLoader.getResourceAsStream("impulse/"+impulseName);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte buff[] = new byte[1024];
+            int read = 0;
+            try {
+                while ((read = is.read(buff)) > 0) {
+                    baos.write(buff, 0, read);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            buff = baos.toByteArray();
+            Int8Array i8 = Int8Array.create(buff.length);
+            for (int i = 0; i < buff.length; i++) {
+                i8.set(i, buff[i]);
+            }          
+            ctx.decodeAudioData(i8.getBuffer(), (abuff) -> {
+                convolver.setBuffer(abuff);
+            });
+        }
+
         private void reconnectPositional() {
             AudioBufferSourceNode node=getNode();
             node.disconnect();
             panner.disconnect();
             gain.disconnect();
+            convolver.disconnect();
             node.connect(panner);
             panner.connect(gain);
-            gain.connect(getContext().getDestination());
+            if (currentEnv==null) {
+                gain.connect(getContext().getDestination());
+            } else {
+                gain.connect(convolver);
+                convolver.connect(getContext().getDestination());
+                setupConvolver();
+            }            
             setLoop(loop);
 
         }
@@ -149,8 +214,13 @@ public class WebAudioRenderer implements AudioRenderer {
             panner.disconnect();
             gain.disconnect();
             node.connect(gain);
-
-            gain.connect(getContext().getDestination());
+            if (currentEnv==null) {
+                gain.connect(getContext().getDestination());
+            } else {
+                gain.connect(convolver);
+                convolver.connect(getContext().getDestination());
+                setupConvolver();
+            }
             setLoop(loop);
         }
     }
@@ -201,12 +271,12 @@ public class WebAudioRenderer implements AudioRenderer {
         if (swapOrder) reverseOrder(channelSample);
         double dcOffset = 0;
         if (bps == 8) {
-            int n = channelSample[0];
+            byte n = channelSample[0] ;
             float fbe;
             if (n < 0) {
                 fbe = (float)((((double) n)-dcOffset) / 128.);
             } else {
-                fbe = (float)((((double) n)+dcOffset) / 127.);
+                fbe = (float) ((((double) n) + dcOffset) / 127.);
             }
             out.set(j, fbe);
         } else if (bps == 16) {
@@ -317,13 +387,16 @@ public class WebAudioRenderer implements AudioRenderer {
         
 
         if (entry == null) {
-            entry = new AudioEntry();            
+            entry = new AudioEntry();
+            entry.currentEnv = this.env;
+            // entry.sampleRate=src.getAudioData().getSampleRate();     
             AudioBuffer buff = updateAudioData(entry, src.getAudioData());            
             while (nodes.size() <= index) nodes.add(null);
             entry.buffer = buff;
             entry.duration=src.getAudioData().getDuration();
             entry.panner = entry.getContext().createPanner();
             entry.gain = entry.getContext().createGain();
+            entry.convolver=entry.getContext().createConvolver();
             entry.channel = index;
             entry.time = src.getTimeOffset();
             nodes.set(index, entry);
@@ -399,6 +472,14 @@ public class WebAudioRenderer implements AudioRenderer {
                 e.pause();
             }
             src.setStatus(AudioSource.Status.Paused);
+        }
+    }
+
+    private void forEachEntry(Consumer<AudioEntry> consumer) {
+        for (Entry<AudioSource, List<AudioEntry>> entry : howlers.entrySet()) {
+            for (AudioEntry e : entry.getValue()) {
+                consumer.accept(e);
+            }
         }
     }
 
@@ -622,6 +703,8 @@ public class WebAudioRenderer implements AudioRenderer {
 
     @Override
     public void setEnvironment(Environment env) {
+        this.env = env;
+        forEachEntry(e->e.setEnvironment(env));
     }
 
     @Override
