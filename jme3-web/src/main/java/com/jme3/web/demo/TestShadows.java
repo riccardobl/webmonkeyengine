@@ -191,13 +191,14 @@ public class TestShadows extends SimpleApplication implements ActionListener, An
 
         dlsf = new DirectionalLightShadowFilter(assetManager, SHADOWMAP_SIZE, 3);
         dlsf.setLight(l);
+        
         dlsf.setLambda(0.55f);
         dlsf.setShadowIntensity(0.8f);
         dlsf.setEdgeFilteringMode(EdgeFilteringMode.PCFPOISSON);
         dlsf.setEnabled(true);
         dlsf.setShadowCompareMode(CompareMode.Hardware);
         dlsf.setEnabledStabilization(true);
-        dlsf.setRenderBackFacesShadows(false);
+        dlsf.setRenderBackFacesShadows(true);
 
         PointLightShadowFilter plsf = new PointLightShadowFilter(assetManager, SHADOWMAP_SIZE);
         plsf.setLight(pl);

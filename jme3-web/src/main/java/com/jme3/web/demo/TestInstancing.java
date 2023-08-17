@@ -72,7 +72,7 @@ public class TestInstancing extends SimpleApplication {
         
         rootNode.attachChild(instancedNode);
         
-        int extent = 30;
+        int extent = 10;
         
         for (int y = -extent; y < extent; y++) {
             for (int x = -extent; x < extent; x++) {
