@@ -42,4 +42,13 @@ public interface JsonPrimitive {
     
     boolean getAsBoolean();
     
+    boolean isNumber();
+
+    boolean isBoolean();
+
+    boolean isString();
+
+    String getAsString();
+
+    Number getAsNumber();
 }

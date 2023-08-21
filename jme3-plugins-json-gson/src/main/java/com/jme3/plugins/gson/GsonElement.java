@@ -43,6 +43,11 @@ public class GsonElement implements JsonElement {
         this.element = element;
     }
 
+    protected boolean isNull(com.google.gson.JsonElement element) {
+        if (element == null) return true;
+        if (element.isJsonNull()) return true;
+        return false;
+    }
     @Override
     public String getAsString() {
         return element.getAsString();
@@ -64,6 +69,11 @@ public class GsonElement implements JsonElement {
     }
 
     @Override
+    public Number getAsNumber() {
+        return element.getAsNumber();        
+    }
+
+    @Override
     public boolean getAsBoolean() {
         return element.getAsBoolean();
     }
@@ -71,6 +81,11 @@ public class GsonElement implements JsonElement {
     @Override
     public JsonArray getAsJsonArray() {
         return new GsonArray(element.getAsJsonArray());
+    }
+
+    @Override
+    public JsonPrimitive getAsJsonPrimitive() {
+        return new GsonPrimitive(element.getAsJsonPrimitive());
     }
     
 }
