@@ -67,9 +67,10 @@ public class IBLHybridEnvBakerLight extends GenericEnvBaker implements IBLEnvBak
         super(rm, am, format, depthFormat, env_size);
 
         specular = new TextureCubeMap(specular_size, specular_size, format);
+        specular.setWrap(WrapMode.EdgeClamp);
         specular.setMagFilter(MagFilter.Bilinear);
         specular.setMinFilter(MinFilter.Trilinear);
-        specular.setWrap(WrapMode.EdgeClamp);
+
         specular.getImage().setColorSpace(ColorSpace.Linear);
         int nbMipMaps = (int) (Math.log(specular_size) / Math.log(2) + 1);
         if (nbMipMaps > 6) nbMipMaps = 6;
@@ -79,8 +80,10 @@ public class IBLHybridEnvBakerLight extends GenericEnvBaker implements IBLEnvBak
             sizes[i] = size * size * (specular.getImage().getFormat().getBitsPerPixel() / 8);
         }
         specular.getImage().setMipMapSizes(sizes);
-    }
+        specular.getImage().setMipmapsGenerated(true);
 
+    }
+    
     @Override
     public boolean isTexturePulling() { // always pull textures from gpu
         return true;
@@ -107,6 +110,7 @@ public class IBLHybridEnvBakerLight extends GenericEnvBaker implements IBLEnvBak
                 specularbakers[i]=new FrameBuffer(mipWidth,mipHeight,1);
                 specularbakers[i].setSrgb(false);
                 specularbakers[i].addColorTarget(FrameBufferTarget.newTarget(specular).level(mip).face(i));
+                specularbakers[i].setMipMapsGenerationHint(false);
             }
 
 
@@ -134,7 +138,7 @@ public class IBLHybridEnvBakerLight extends GenericEnvBaker implements IBLEnvBak
         
         if (isTexturePulling()) endPulling(specular);
         specular.getImage().clearUpdateNeeded();
-
+ 
     }
 
     @Override
