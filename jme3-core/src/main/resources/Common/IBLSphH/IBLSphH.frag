@@ -3,7 +3,7 @@
 *   - Riccardo Balbo
 */
 #import "Common/ShaderLib/GLSLCompat.glsllib"
-#import "Common/IBL/Math.glsllib"
+#import "Common/IBL/Math.glsl"
 
 // #define NUM_SH_COEFFICIENT 9
 #ifndef PI
