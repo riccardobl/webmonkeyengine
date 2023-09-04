@@ -552,7 +552,7 @@ public class EnvMapUtils {
         ui = ui & 0xffffffff;
         store.setY(2.3283064365386963e-10f * ui); /* 0x100000000 */
 
-        phi = 2.0f * PI * store.y;
+        phi = 2.0f * PI * store.x;
         store.setZ(cos(phi));
         store.setW(sin(phi));
 
@@ -564,7 +564,7 @@ public class EnvMapUtils {
             store = new Vector3f();
         }
 
-        float cosTheta = sqrt((1f - xi.x) / (1f + (a2 - 1f) * xi.x));
+        float cosTheta = sqrt((1f - xi.y) / (1f + (a2 - 1f) * xi.y));
         float sinTheta = sqrt(1f - cosTheta * cosTheta);
 
         float sinThetaCosPhi = sinTheta * xi.z;//xi.z is cos(phi)
@@ -586,7 +586,7 @@ public class EnvMapUtils {
 
         // Tangent to world space
         store.set(tangentX).addLocal(tangentY).addLocal(vars.vect5);
-
+        store.normalizeLocal();
         return store;
     }
 

@@ -57,6 +57,55 @@ dependencies {
 
 
 
+task generateThumbnails(type: Copy) {
+    def sourceDir = file("$buildDir/generated/teavm/js/")
+
+    from sourceDir
+    into sourceDir // We'll use the same directory for both source and destination
+
+    include '**/*.png'
+
+    eachFile { details ->
+        if (details.file.isFile()) {
+            def inputFile = details.file
+
+            // Set the desired thumbnail size (you can change this as needed)
+            def thumbnailWidth = 128
+            def thumbnailHeight = 128
+
+            // Determine the relative path of the current file
+            def relativePath = sourceDir.toPath().relativize(inputFile.toPath())
+
+            // Build the path to the .thumbnail/jme directory for the current file
+            def thumbnailDir = new File(sourceDir, relativePath.toString() + "/.thumbnail/jme")
+            thumbnailDir.mkdirs()
+
+            // Build the output file path for the thumbnail
+            def outputFile = new File(thumbnailDir, inputFile.name)
+
+            // Resize the image using pure Java
+            resizeImage(inputFile, outputFile, thumbnailWidth, thumbnailHeight)
+        }
+    }
+}
+
+def resizeImage(inputFile, outputFile, width, height) {
+    try {
+        def inputImage = javax.imageio.ImageIO.read(inputFile)
+        def outputImage = new java.awt.image.BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+        def graphics2D = outputImage.createGraphics()
+
+        // Apply the resizing
+        graphics2D.drawImage(inputImage, 0, 0, width, height, null)
+        graphics2D.dispose()
+
+        // Save the resized image
+        javax.imageio.ImageIO.write(outputImage, "png", outputFile)
+    } catch (Exception e) {
+        e.printStackTrace()
+    }
+}
+
 task copyAllResources(type: Copy) {
     from "src/main/resources"
     configurations.each { configuration ->
@@ -118,8 +167,8 @@ def generateSHA256(file) {
 teavm.js {
     addedToWebApp = true
     mainClass = "com.jme3.web.WebApp"
-    obfuscated = true
-    debugInformation = false
+    obfuscated = false
+    debugInformation = true
     strict= false
     outOfProcess=false
     // processMemory=6000
@@ -155,6 +204,8 @@ teavm.js {
          "**/DDSLoader.java",
 
         "**/BitmapFontLoader.java",
+                "**/LightProbe.java",
+
         // "**/SkeletonLoader.java",
         // "**/MaterialLoader.java",
         // "**/SceneLoader.java",

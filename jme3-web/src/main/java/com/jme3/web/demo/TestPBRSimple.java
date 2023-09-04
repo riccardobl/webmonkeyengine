@@ -52,6 +52,8 @@ public class TestPBRSimple extends SimpleApplication {
         NativeUtils.setProgress((this.progress += increment), "Loading tank material");
         Material pbrMat = assetManager.loadMaterial("Models/Tank/tank.j3m");
         model.setMaterial(pbrMat);
+        model = model.clone();
+
         rootNode.attachChild(model);
 
         NativeUtils.setProgress((this.progress += increment), "Loading camera");

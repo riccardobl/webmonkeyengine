@@ -35,7 +35,9 @@ public class TestPBRSimple extends SimpleApplication {
 
         Material pbrMat = assetManager.loadMaterial("Models/Tank/tank.j3m");
         model.setMaterial(pbrMat);
+        model = model.clone();
         rootNode.attachChild(model);
+        
 
         ChaseCamera chaseCam = new ChaseCamera(cam, model, inputManager);
         chaseCam.setDragToRotate(true);

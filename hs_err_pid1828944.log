@@ -1,0 +1,88 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x0000000000000000, pid=1828944, tid=1829032
+#
+# JRE version: OpenJDK Runtime Environment AdoptOpenJDK-dcevm-11.0.11+1-202105021744 (11.0.11+1) (build 11.0.11+1-202105021744)
+# Java VM: Dynamic Code Evolution 64-Bit Server VM AdoptOpenJDK-dcevm-11.0.11+1-202105021744 (11.0.11+1-202105021744, mixed mode, tiered, compressed oops, g1 gc, linux-amd64)
+# Problematic frame:
+# C  0x0000000000000000
+#
+# Core dump will be written. Default location: Core dumps may be processed with "/usr/share/apport/apport -p%p -s%s -c%c -d%d -P%P -u%u -g%g -- %E" (or dumping to /PROJ/DEV/webmonkeyengine/core.1828944)
+#
+# If you would like to submit a bug report, please visit:
+#   https://github.com/AdoptOpenJDK/openjdk-support/issues
+#
+
+---------------  S U M M A R Y ------------
+
+Command Line: jme3test.TestDemo1
+
+Host: AMD Ryzen 5 3600 6-Core Processor, 12 cores, 15G, Ubuntu 22.04.2 LTS
+Time: Mon Aug 21 17:08:24 2023 CEST elapsed time: 9.923239 seconds (0d 0h 0m 9s)
+
+---------------  T H R E A D  ---------------
+
+Current thread is native thread
+
+Stack: [0x00007f919e4e0000,0x00007f919e5df000],  sp=0x00007f919e5ddc58,  free space=1015k
+
+siginfo: si_signo: 11 (SIGSEGV), si_code: 1 (SEGV_MAPERR), si_addr: 0x0000000000000000
+
+Register to memory mapping:
+
+RAX=
+[error occurred during error reporting (printing register info), id 0xb, SIGSEGV (0xb) at pc=0x00007f9264c181e7]
+
+Registers:
+RAX=0x00007f91abe577c0, RBX=0x0000000000000400, RCX=0x00007f91a45baa80, RDX=0x00007f91a45da980
+RSP=0x00007f919e5ddc58, RBP=0x00007f91a45c5870, RSI=0x0000000000000000, RDI=0x00007f91a45c5870
+R8 =0x00007f91a45bdb10, R9 =0x0000000000000000, R10=0x00007f919e5ddda0, R11=0x0000000000000202
+R12=0x00007f91a45c9a00, R13=0x0000000000012000, R14=0x0000000000001000, R15=0x00007f919e5dde08
+RIP=0x0000000000000000, EFLAGS=0x0000000000010246, CSGSFS=0x002b000000000033, ERR=0x0000000000000014
+  TRAPNO=0x000000000000000e
+
+Top of Stack: (sp=0x00007f919e5ddc58)
+0x00007f919e5ddc58:   00007f91abc204d1 0000000000000000
+0x00007f919e5ddc68:   0000000000000000 00000000bb800000
+0x00007f919e5ddc78:   00007f91ab3b93a0 00007f9100000000
+0x00007f919e5ddc88:   00007f9265514a84 00007f919e5ddce7 
+
+Instructions: (pc=0x0000000000000000)
+0xffffffffffffff00:   
+
+
+Stack slot to memory mapping:
+stack at sp + 0 slots: 
+[error occurred during error reporting (inspecting top of stack), id 0xb, SIGSEGV (0xb) at pc=0x00007f9264c181e7]
+
+
+---------------  P R O C E S S  ---------------
+
+VM state:at safepoint (shutting down)
+
+VM Mutex/Monitor currently owned by a thread:  ([mutex/lock_event])
+[0x00007f925c0258e0] Threads_lock - owner thread: 0x00007f925c20f800
+
+Heap address: 0x0000000707000000, size: 3984 MB, Compressed Oops mode: Zero based, Oop shift amount: 3
+Narrow klass base: 0x0000000800000000, Narrow klass shift: 0
+Compressed class space size: 1073741824 Address: 0x0000000800000000
+
+Heap:
+ garbage-first heap   total 140288K, used 31972K [0x0000000707000000, 0x0000000800000000)
+  region size 1024K, 11 young (11264K), 1 survivors (1024K)
+ Metaspace       used 31983K, capacity 32636K, committed 33152K, reserved 1079296K
+  class space    used 3304K, capacity 3593K, committed 3712K, reserved 1048576K
+Heap Regions: E=young(eden), S=young(survivor), O=old, HS=humongous(starts), HC=humongous(continues), CS=collection set, F=free, A=archive, TAMS=top-at-mark-start (previous, next)
+|   0|0x0000000707000000, 0x0000000707100000, 0x0000000707100000|100%|HS|  |TAMS 0x0000000707100000, 0x0000000707000000| Complete 
+|   1|0x0000000707100000, 0x0000000707200000, 0x0000000707200000|100%|HC|  |TAMS 0x0000000707200000, 0x0000000707100000| Complete 
+|   2|0x0000000707200000, 0x00000007072ff978, 0x0000000707300000| 99%| O|  |TAMS 0x00000007072ff978, 0x0000000707200000| Untracked 
+|   3|0x0000000707300000, 0x0000000707400000, 0x0000000707400000|100%| O|  |TAMS 0x0000000707400000, 0x0000000707300000| Untracked 
+|   4|0x0000000707400000, 0x0000000707500000, 0x0000000707500000|100%| O|  |TAMS 0x0000000707500000, 0x0000000707400000| Untracked 
+|   5|0x0000000707500000, 0x00000007075fb880, 0x0000000707600000| 98%| O|  |TAMS 0x00000007075fb880, 0x0000000707500000| Untracked 
+|   6|0x0000000707600000, 0x00000007076ed758, 0x0000000707700000| 92%| O|  |TAMS 0x00000007076ed758, 0x0000000707600000| Untracked 
+|   7|0x0000000707700000, 0x00000007077f1430, 0x0000000707800000| 94%| O|  |TAMS 0x00000007077f1430, 0x0000000707700000| Untracked 
+|   8|0x0000000707800000, 0x0000000707900000, 0x0000000707900000|100%| O|  |TAMS 0x0000000707900000, 0x0000000707800000| Untracked 
+|   9|0x0000000707900000, 0x000000070791b400, 0x0000000707a00000| 10%| O|  |TAMS 0x000000070791b400, 0x0000000707900000| Untracked 
+|  10|0x0000000707a00000, 0x0000000707a00000, 0x0000000707b00000|  0%| F|  |TAMS 0x0000000707a00000, 0x0000000707a00000| Untracked 
+|  11|0x0000000707b00000, 0x0000000707b00000, 0x0000000707c00000|  0%

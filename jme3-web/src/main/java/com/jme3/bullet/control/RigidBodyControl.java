@@ -339,11 +339,22 @@ public class RigidBodyControl extends PhysicsRigidBody implements PhysicsControl
      *
      * @return the pre-existing quaternion (not null)
      */
-    private Quaternion getSpatialRotation(){
-        if(motionState.isApplyPhysicsLocal()){
+    private Quaternion getSpatialRotation() {
+        if (motionState.isApplyPhysicsLocal()) {
             return spatial.getLocalRotation();
         }
         return spatial.getWorldRotation();
+    }
+    
+    /**
+     * Access whichever spatial scale corresponds to the physics scale.
+     * @return
+     */
+    private Vector3f getSpatialScale() {
+        if (motionState.isApplyPhysicsLocal()) {
+            return spatial.getLocalScale();
+        }
+        return spatial.getWorldScale();
     }
 
     /**
@@ -358,6 +369,7 @@ public class RigidBodyControl extends PhysicsRigidBody implements PhysicsControl
             if (isKinematic() && kinematicSpatial) {
                 super.setPhysicsLocation(getSpatialTranslation());
                 super.setPhysicsRotation(getSpatialRotation());
+                super.getCollisionShape().setScale(getSpatialScale());
             } else {
                 getMotionState().applyTransform(spatial);
             }

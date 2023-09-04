@@ -34,6 +34,7 @@ package com.jme3.environment.generation;
 import com.jme3.app.Application;
 import com.jme3.environment.util.CubeMapWrapper;
 import com.jme3.environment.util.EnvMapUtils;
+import com.jme3.environment.util.EnvMapUtils.GenerationType;
 import com.jme3.math.*;
 import com.jme3.texture.TextureCubeMap;
 
@@ -237,7 +238,6 @@ public class PrefilteredEnvMapFaceGenerator extends RunnableWithProgress {
         for (int i = 0; i < numSamples; i++) {
             Xi = getHammersleyPoint(i, numSamples, Xi);
             H = importanceSampleGGX(Xi, a2, H);
-            H.normalizeLocal();
             float VoH = H.z;
             Vector3f L = H.multLocal(VoH * 2f).subtractLocal(V);
             float NoL = L.z;
@@ -341,7 +341,7 @@ public class PrefilteredEnvMapFaceGenerator extends RunnableWithProgress {
             store = new Vector3f();
         }
 
-        float cosTheta = sqrt((1f - xi.x) / (1f + (a2 - 1f) * xi.x));
+        float cosTheta = sqrt((1f - xi.y) / (1f + (a2 - 1f) * xi.y));
         float sinTheta = sqrt(1f - cosTheta * cosTheta);
 
         float sinThetaCosPhi = sinTheta * xi.z;//xi.z is cos(phi)

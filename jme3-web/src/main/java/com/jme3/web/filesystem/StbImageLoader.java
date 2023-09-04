@@ -11,6 +11,7 @@ import org.nothings.stb.image.ColorComponents;
 import org.nothings.stb.image.ImageResult;
 import com.jme3.asset.AssetInfo;
 import com.jme3.asset.AssetLoader;
+import com.jme3.asset.TextureKey;
 import com.jme3.texture.Image;
 import com.jme3.texture.Image.Format;
 import com.jme3.util.BufferUtils;
@@ -29,7 +30,8 @@ public class StbImageLoader  implements AssetLoader {
     }
     @Override
     public Object load(AssetInfo assetInfo) throws IOException {
-        try{
+        try {
+            boolean flip = ((TextureKey) assetInfo.getKey()).isFlipY();
             InputStream is = new BufferedInputStream(assetInfo.openStream());
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
@@ -45,7 +47,7 @@ public class StbImageLoader  implements AssetLoader {
             int h = ir.getHeight();
             int bpc = ir.getBitsPerChannel();
             byte data[] = ir.getData();
-            flipImage(data, w, h, bpc*4);
+            if(flip)flipImage(data, w, h, bpc*4);
             ByteBuffer bbf = BufferUtils.createByteBuffer(data.length);
             bbf.put(data);
             bbf.flip();

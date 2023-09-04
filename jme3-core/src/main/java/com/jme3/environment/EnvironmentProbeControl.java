@@ -39,6 +39,7 @@ public class EnvironmentProbeControl extends LightProbe implements Control {
     private int envMapSize=256;
     private Spatial spatial;
     private boolean serializable = false;
+    private Spatial envSpatial;
 
     private Function<Geometry, Boolean> filter = (s) -> {
         return s.getUserData("tags.env") != null;
@@ -60,6 +61,10 @@ public class EnvironmentProbeControl extends LightProbe implements Control {
         } else if (s instanceof Geometry) {
             s.setUserData("tags.env", true);
         }
+    }
+
+    public void setEnvironment(Spatial envSpatial) {
+        this.envSpatial = envSpatial;
     }
 
     protected EnvironmentProbeControl() {
@@ -121,6 +126,11 @@ public class EnvironmentProbeControl extends LightProbe implements Control {
     }
 
     void rebakeNow(RenderManager renderManager) {
+        Spatial spatialToBake = envSpatial;
+        if (spatialToBake == null) {
+            spatialToBake = spatial;
+        }
+
         if (assetManager == null) {
             LOG.log(Level.SEVERE, "AssetManager is null, cannot bake environment. Please use setAssetManager() to set it.");
             return;
@@ -142,7 +152,7 @@ public class EnvironmentProbeControl extends LightProbe implements Control {
         }
         baker.setTexturePulling(isSerializeBakeResults());
 
-        baker.bakeEnvironment(spatial, Vector3f.ZERO, 0.001f, 1000f, filter);
+        baker.bakeEnvironment(spatialToBake, Vector3f.ZERO, 0.001f, 1000f, filter);
         baker.bakeSpecularIBL();
         baker.bakeSphericalHarmonicsCoefficients();
 
@@ -163,6 +173,7 @@ public class EnvironmentProbeControl extends LightProbe implements Control {
         oc.write(envMapSize, "size", 256);
         oc.write(serializable, "serializable", false);
         oc.write(bakeNeeded, "bakeNeeded", true);
+        oc.write(spatial!=envSpatial?envSpatial:null, "envSpatial", null);
     }
     
     @Override
@@ -173,6 +184,11 @@ public class EnvironmentProbeControl extends LightProbe implements Control {
         serializable = ic.readBoolean("serializable", false);
         bakeNeeded = ic.readBoolean("bakeNeeded", true);
         assetManager = im.getAssetManager();
+        envSpatial = (Spatial) ic.readSavable("envSpatial", null);
+        if (envSpatial == spatial) {
+            envSpatial = null;
+        }
     }
+
 
 }

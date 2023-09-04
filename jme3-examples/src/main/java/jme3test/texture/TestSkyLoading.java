@@ -33,7 +33,10 @@
 package jme3test.texture;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.material.Material;
+import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
+import com.jme3.scene.shape.Box;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
 
@@ -55,6 +58,17 @@ public class TestSkyLoading extends SimpleApplication {
 
         Spatial sky = SkyFactory.createSky(assetManager, west, east, north, south, up, down);
         rootNode.attachChild(sky);
+
+        Geometry geo = new Geometry("Test", new Box(1, 1, 1));
+        geo.setMaterial(new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md"));
+        rootNode.attachChild(geo);
+
+        cam.setLocation(geo.getLocalTranslation().add(0, 0, 20));
+        cam.lookAt(geo.getLocalTranslation(), geo.getLocalTranslation().normalize().negate());
+
+        flyCam.setMoveSpeed(200);
+        
+        
     }
 
 }

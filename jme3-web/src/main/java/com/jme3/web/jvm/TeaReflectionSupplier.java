@@ -25,8 +25,14 @@ import com.jme3.asset.CloneableAssetProcessor;
 import com.jme3.asset.cache.AssetCache;
 import com.jme3.asset.cache.SimpleAssetCache;
 import com.jme3.audio.Filter;
+import com.jme3.bullet.gltf.BulletRigidbodyExtensionLoader;
 import com.jme3.export.Savable;
 import com.jme3.material.logic.TechniqueDefLogic;
+import com.jme3.scene.plugins.gltf.ext.JME_speaker.SpeakerExtensionLoader;
+import com.jme3.scene.plugins.gltf.ext.KHR_lights_punctual.LightsPunctualExtensionLoader;
+import com.jme3.scene.plugins.gltf.ext.KHR_materials_pbrSpecularGlossiness.PBRSpecGlossExtensionLoader;
+import com.jme3.scene.plugins.gltf.ext.KHR_materials_unlit.UnlitExtensionLoader;
+import com.jme3.scene.plugins.gltf.ext.KHR_texture_transform.TextureTransformExtensionLoader;
 import com.jme3.system.JmeSystem;
 import com.jme3.system.JmeSystemDelegate;
 import com.jme3.texture.TextureProcessor;
@@ -36,6 +42,7 @@ import com.jme3.web.context.HeapAllocator;
 import com.jme3.web.filesystem.WebResourceLoaderImpl;
 import com.jme3.web.filesystem.WebResourceLoaderImplNoCache;
 import com.jme3.json.*;
+import com.jme3.light.LightProbe;
 
 public class TeaReflectionSupplier implements ReflectionSupplier {
 
@@ -63,6 +70,13 @@ public class TeaReflectionSupplier implements ReflectionSupplier {
         TeaReflectionSupplier.addReflectionClass(TeaJSONParser.class);
         TeaReflectionSupplier.addReflectionClass(WebResourceLoaderImpl.class);
         TeaReflectionSupplier.addReflectionClass(WebResourceLoaderImplNoCache.class);
+                TeaReflectionSupplier.addReflectionClass(LightProbe.class);
+       TeaReflectionSupplier.addReflectionClass(PBRSpecGlossExtensionLoader.class);
+      TeaReflectionSupplier.addReflectionClass(LightsPunctualExtensionLoader.class);
+       TeaReflectionSupplier.addReflectionClass(  UnlitExtensionLoader.class);
+       TeaReflectionSupplier.addReflectionClass( TextureTransformExtensionLoader.class);
+       TeaReflectionSupplier.addReflectionClass( SpeakerExtensionLoader.class);
+       TeaReflectionSupplier.addReflectionClass( BulletRigidbodyExtensionLoader.class);
 
         // TeaReflectionSupplier.addReflectionClass(GenericConstraint.class);
         // TeaReflectionSupplier.addReflectionClass(AnimControl.class);

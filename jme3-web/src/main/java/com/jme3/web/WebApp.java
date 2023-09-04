@@ -17,7 +17,9 @@ import com.jme3.web.context.JmeWebSystem;
 import com.jme3.web.context.NativeUtils;
 import com.jme3.web.demo.TestShadows;
 import com.jme3.web.demo.TestInstancing;
+import com.jme3.web.demo.TestPBR2;
 import com.jme3.web.demo.TestAudio;
+import com.jme3.web.demo.TestDemo1;
 import com.jme3.web.demo.TestPBRSimple;
 import com.jme3.web.demo.TestPhysics;
 
@@ -42,7 +44,6 @@ public class WebApp {
         settings.setSamples(0);
         settings.setFullscreen(false);
         
-
         AppState appStates[] = {
 
             new StatsAppState(), new FlyCamAppState(), new AudioListenerState(), new DebugKeysAppState(),
@@ -68,7 +69,12 @@ public class WebApp {
             case "inst":
                 app = new TestInstancing(appStates);
                 break;
-      
+            case "demo1":
+                app = new TestDemo1(appStates);
+                break;
+            case "pbr2":
+                app = new TestPBR2(appStates);
+                break;
         }
 
         app.setSettings(settings);

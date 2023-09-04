@@ -40,7 +40,7 @@ public class TeaJSONObject extends TeaJSONElement implements JsonObject {
     @Override
     public JsonElement get(String string) {
         if (!JSObjects.hasProperty(element, string)) return null;
-        return new TeaJSONElement(((org.teavm.jso.JSObject)obj().get(string)));
+        return new TeaJSONElement(((org.teavm.jso.JSObject)obj().get(string))).autoCast();
         
     }
 
@@ -59,7 +59,7 @@ public class TeaJSONObject extends TeaJSONElement implements JsonObject {
 
                 @Override
                 public TeaJSONElement getValue() {
-                    return new TeaJSONElement((org.teavm.jso.JSObject)obj().get(key));
+                    return new TeaJSONElement((org.teavm.jso.JSObject)obj().get(key)).autoCast();
                 }
 
                 @Override

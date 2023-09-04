@@ -36,8 +36,10 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.bullet.PhysicsSpace.BroadphaseType;
 import com.jme3.bullet.debug.BulletDebugAppState;
+import com.jme3.bullet.gltf.BulletRigidbodyExtensionLoader;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.RenderManager;
+import com.jme3.scene.plugins.gltf.GltfLoader;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -58,6 +60,9 @@ import java.util.logging.Logger;
 public class BulletAppState
         extends AbstractAppState
         implements PhysicsTickListener {
+    static {
+        GltfLoader.registerExtension("JME_rigidbody", BulletRigidbodyExtensionLoader.class);
+    }
 
     /**
      * true if-and-only-if the physics simulation is running (started but not
