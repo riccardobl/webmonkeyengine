@@ -87,4 +87,11 @@ public interface JsonElement {
      * @return
      */
     JsonPrimitive getAsJsonPrimitive();
+
+
+    /**
+     * Cast this JsonElement to a specific type
+     * @return the casted JsonElement
+     */
+    <T extends JsonElement> T autoCast();
 }

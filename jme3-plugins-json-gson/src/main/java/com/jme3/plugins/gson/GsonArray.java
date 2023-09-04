@@ -60,7 +60,7 @@ public class GsonArray extends GsonElement implements JsonArray {
 
             @Override
             public JsonElement next() {
-                return new GsonElement(it.next());
+                return new GsonElement(it.next()).autoCast();
             }
         };
     }
@@ -68,7 +68,7 @@ public class GsonArray extends GsonElement implements JsonArray {
     @Override
     public JsonElement get(int i) {
         com.google.gson.JsonElement el=arr().get(i);
-        return isNull(el)?null:new GsonElement(el);
+        return isNull(el)?null:new GsonElement(el).autoCast();
     }
 
     @Override

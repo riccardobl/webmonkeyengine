@@ -31,9 +31,10 @@
  */
 package com.jme3.scene.plugins.gltf;
 
-import com.jme3.plugins.json.*;
 
 import java.io.IOException;
+
+import com.jme3.plugins.json.JsonElement;
 
 /**
  * Interface to handle a glTF extension.

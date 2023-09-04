@@ -63,7 +63,7 @@ public abstract class MaterialAdapter {
 
     protected abstract MatParam adaptMatParam(MatParam param);
 
-    protected void init(AssetManager assetManager) {
+    public void init(AssetManager assetManager) {
         this.assetManager = assetManager;
         this.reset();
     }
@@ -81,6 +81,7 @@ public abstract class MaterialAdapter {
 
     public void setParam(String gltfParamName, Object value) {
         String name = getJmeParamName(gltfParamName);
+        System.out.println("Map param "+gltfParamName + " -> " + name+" "+value);
         if (name == null || value == null) {
             //no mapping registered or value is null, let's ignore this param
             return;

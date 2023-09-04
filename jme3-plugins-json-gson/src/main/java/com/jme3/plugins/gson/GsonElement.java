@@ -43,11 +43,22 @@ public class GsonElement implements JsonElement {
         this.element = element;
     }
 
+
+    @SuppressWarnings("unchecked")
+    public <T extends JsonElement> T autoCast() {
+        if(isNull(element)) return null;
+        if (element.isJsonArray()) return (T) new GsonArray(element.getAsJsonArray());
+        if (element.isJsonObject()) return (T) new GsonObject(element.getAsJsonObject());
+        if (element.isJsonPrimitive()) return (T) new GsonPrimitive(element.getAsJsonPrimitive());
+        return (T) new GsonElement(element);
+    }
+    
     protected boolean isNull(com.google.gson.JsonElement element) {
         if (element == null) return true;
         if (element.isJsonNull()) return true;
         return false;
     }
+    
     @Override
     public String getAsString() {
         return element.getAsString();

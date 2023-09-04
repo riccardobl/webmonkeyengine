@@ -34,8 +34,15 @@ package com.jme3.scene.plugins.gltf;
 import com.jme3.asset.AssetInfo;
 import com.jme3.asset.AssetLoadException;
 import com.jme3.math.*;
+import com.jme3.plugins.json.Json;
+import com.jme3.plugins.json.JsonArray;
+import com.jme3.plugins.json.JsonElement;
+import com.jme3.plugins.json.JsonObject;
+import com.jme3.plugins.json.JsonParser;
 import com.jme3.scene.*;
-import com.jme3.plugins.json.*;
+import com.jme3.scene.plugins.gltf.GltfLoader.SkinBuffers;
+import com.jme3.scene.plugins.gltf.GltfLoader.WeightData;
+
 import com.jme3.texture.Texture;
 import com.jme3.util.*;
 import java.io.*;
