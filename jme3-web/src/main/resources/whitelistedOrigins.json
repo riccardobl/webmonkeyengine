@@ -1,0 +1,36 @@
+{
+    "model": [
+        "^https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/",
+        "^https://github.com/jMonkeyEngine/jmonkeyengine/raw/master/jme3-testdata/src/main/resources/",
+        "^https://ar.larabiosa.it/",
+        "^https://preview.larabiosa-shop.pages.dev/"
+    ],
+    "material": [
+        "^https://github.com/jMonkeyEngine/jmonkeyengine/raw/master/jme3-testdata/src/main/resources/",
+        "^https://ar.larabiosa.it/",
+        "^https://github.com/riccardobl/webmonkeyengine/raw/master/jme3-testdata/src/main/resources/",
+        "^https://preview.larabiosa-shop.pages.dev/"
+    ],
+    "environment":[
+        "^https://dl.polyhaven.org/file/ph-assets/HDRIs/",
+                "^https://github.com/jMonkeyEngine/jmonkeyengine/raw/master/jme3-testdata/src/main/resources/",
+        "^https://ar.larabiosa.it/",
+        "^https://preview.larabiosa-shop.pages.dev/"
+    ],
+    "corsProxy":[
+        "=https://corsproxy.io/?%URL%"
+    ],
+    "logo":[
+        "^https://larabiosa.it/wp-content/uploads/",
+        "^https://github.com/jMonkeyEngine/jmonkeyengine/raw/master/jme3-testdata/src/main/resources/",
+        "^https://preview.larabiosa-shop.pages.dev/",
+        "^https://ar.larabiosa.it/"
+    ],
+    "assetRoot":[
+        "^https://github.com/jMonkeyEngine/jmonkeyengine/raw/master/jme3-testdata/src/main/resources/",
+        "^https://github.com/riccardobl/webmonkeyengine/raw/master/jme3-testdata/src/main/resources/",
+        "^https://preview.larabiosa-shop.pages.dev/"
+    ]
+
+
+}

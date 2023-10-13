@@ -133,7 +133,7 @@ public class TestGltfLoading extends SimpleApplication {
         //loadModel("Models/gltf/manta/scene.gltf", Vector3f.ZERO, 0.2f);
         //loadModel("Models/gltf/bone/scene.gltf", Vector3f.ZERO, 0.1f);
 //        loadModel("Models/gltf/box/box.gltf", Vector3f.ZERO, 1);
-        loadModel("Models/gltf/duck/Duck.gltf", new Vector3f(0, -1, 0), 1);
+        loadModel("test/parent.gltf", new Vector3f(0, -1, 0), 1);
 //        loadModel("Models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf", Vector3f.ZERO, 1);
 //        loadModel("Models/gltf/hornet/scene.gltf", new Vector3f(0, -0.5f, 0), 0.4f);
 ////        loadModel("Models/gltf/adamHead/adamHead.gltf", Vector3f.ZERO, 0.6f);

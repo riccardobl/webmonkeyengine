@@ -11,6 +11,7 @@ import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.ContrastAdjustmentFilter;
 import com.jme3.post.filters.FXAAFilter;
 import com.jme3.post.filters.ToneMapFilter;
+import com.jme3.post.ssao.SSAOFilter;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Spatial;
 import com.jme3.util.SkyFactory;
@@ -64,7 +65,7 @@ public class TestPBRSimple extends SimpleApplication {
             fpp.setNumSamples(numSamples);
         }
 
-        
+        fpp.addFilter(new SSAOFilter());
         fpp.addFilter(new ToneMapFilter(Vector3f.UNIT_XYZ.mult(4.0f)));
         fpp.addFilter(new FXAAFilter());
         viewPort.addProcessor(fpp);

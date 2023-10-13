@@ -2,145 +2,269 @@
 <html>
 
 <head>
-  <title>Powered by jMonkeyEngine</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Model Viewer Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <script type="text/javascript" charset="utf-8" src="ModelViewer.js"></script>
+  
+    <style>
+        *{
+            box-sizing: border-box;
+        }
+        body {
+            
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #1a1a1a;
+            font-size: 1.3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: stretch;
+padding:1vw;
+        }
 
-  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-  <!-- <script type="text/javascript" charset="utf-8" src="debug/webgl-lint.js"></script> -->
-  <!-- <script type="text/javascript" charset="utf-8" src="howler.js"></script> -->
-  <script type="text/javascript" charset="utf-8" src="jme.js"></script>
-  <!-- <script type="text/javascript" charset="utf-8" src="physics/ammo.js"></script>
-  <script type="text/javascript" charset="utf-8" src="jmeapp.js"></script> -->
+        body > * {
+            margin:0.1rem;
+        }
 
-  <script>
 
-    function init(demo) {
-      document.querySelectorAll('button#startJme').forEach((btn) => {
-        btn.style.display = 'none';
-      });
-      const canvasJme = document.querySelector('canvas#jme');
-      canvasJme.style.display = 'block';
-      window.jme.canvasFitParent(canvasJme);
-      jme.start(demo);
-    }
-  </script>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background-color: #1a1a1a;
-      font-size: 1.3rem;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-      position: fixed;
-      top: 0;
-      left: 0;
 
-    }
+        iframe {
+            flex-grow: 2;
+            height:100%;
+            border:none;
+        }
 
-    canvas#jme {
-      top: 0;
-      left: 0;
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
+        textarea{
+             height:20vh;
+            background-color: #1a1a1a;
+            color: #fff;
+            padding:1rem;
+            border:1px solid #000;
+            border-radius:10px;
+            
+        }
 
-    button#startJme {
-      font-size: 2rem;
-      padding: 1rem;
-      margin: auto;
-      background-color: #d88d02;
-      color: #1a1a1a;
-      font-weight: bold;
-      box-shadow: 0 0 133px #d88d02a4;
-      border: 2px solid #d88d02;
-      border-radius: 16px;
-      font-family: monospace;
+        select{
+            width:100%;
+             background-color: #1a1a1a;
+            color: #fff;
+              font-size: 1rem;
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid #000;
 
-      display: block;
-    }
+        }
 
-    #jmeProgress {
-      display: flex;
-      position: fixed;
-      top: 0;
-      left: 0;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-      flex-direction: column;
-      background: #1a1a1a;
-      color: #d88d02;
-      font-family: monospace;
-      text-transform: uppercase;
-      text-align: center;
-      font-size: 1rem;
-    }
+        button{
+            width:100%;
+             background-color: #272727;
+            color: #fff;
+            padding:1rem;
+               border-radius: 10px;
+    border: 1px double #000;
+                  font-size: 1rem;
 
-    /*style for progress bar*/
-    #jmeProgress progress {
+        }
+    </style>
 
-      all: unset;
-      -webkit-appearance: none;
-      margin: 1rem;
-      width: 32rem;
-      max-width: 90%;
-      height: 1rem;
-      background: #1a1a1a;
-      box-shadow: 0 0 133px #d88d02a4;
-      border: 2px solid #d88d02;
-      border-radius: 32px;
-      overflow: hidden;
-    }
+        <script>
+    
+            const models = {
+                "SciFi-Helmet": {
+                    model: "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/SciFiHelmet/glTF/SciFiHelmet.gltf",
+                    modelScale: 10,
+                    environment: "expo/studio_country_hall_1k.hdr",
+                    cameraCenter: [0,0,0],
+                    corsProxy: "https://corsproxy.io/?%URL%"
+ 
+                },
+                "Damaged-Helmet": {
+                    model: "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/DamagedHelmet/glTF-Binary/DamagedHelmet.glb",
+                    modelScale: 10,
+                    environment: "expo/studio_country_hall_1k.hdr",
+                    corsProxy: "https://corsproxy.io/?%URL%"
+                },
+                "Avocado":{
+                    model : "https://github.com/KhronosGroup/glTF-Sample-Models/raw/master/2.0/Avocado/glTF-Binary/Avocado.glb",
+                     modelScale: 50,
+                    environment: "expo/studio_country_hall_1k.hdr",
+                    corsProxy: "https://corsproxy.io/?%URL%"
 
-    #jmeProgress progress::-webkit-progress-bar {
-      background-color: #1a1a1a;
-    }
+                },
+                "Duck":{
+                    model:"https://github.com/jMonkeyEngine/jmonkeyengine/raw/master/jme3-testdata/src/main/resources/Models/gltf/duck/Duck.gltf",
+                    modelScale: 10,
+                    environment: "https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/kloppenheim_06_puresky_1k.hdr",
+                    cameraCenter: [0, 0, 0],
+                    corsProxy:"https://corsproxy.io/?%URL%",
+                    logo:"https://github.com/jMonkeyEngine/jmonkeyengine/raw/master/jme3-testdata/src/main/resources/Interface/Logo/Monkey.png",
+                    palette:[
+                        "#1a1a1a",
+                        "#5f0018"
+                    ],
+                    showSky:true
 
-    #jmeProgress progress::-webkit-progress-value {
-      background-color: #d88d02;
-    }
+                },
+                "Tank":{
+                    model:"https://github.com/jMonkeyEngine/jmonkeyengine/raw/master/jme3-testdata/src/main/resources/Models/Tank/tank.j3o",
+                    modelScale: 10,
+                    environment: "https://github.com/jMonkeyEngine/jmonkeyengine/raw/master/jme3-testdata/src/main/resources/Textures/Sky/Path.hdr",
+                    cameraCenter: [0, 0, 0],
+                    corsProxy: "https://corsproxy.io/?%URL%",                
+                    showSky: true,
+                    material : "https://github.com/riccardobl/webmonkeyengine/raw/master/jme3-testdata/src/main/resources/Models/Tank/tank.j3m",
+                    assetRoots:[
+                        "https://github.com/riccardobl/webmonkeyengine/raw/master/jme3-testdata/src/main/resources/"
+                    ],
+                    generateTangents: true
+                }
+            }
 
-    #jmeProgress progress::-moz-progress-bar {
-      background-color: #d88d02;
-    }
+            window.addEventListener("load", () => {
+              
 
-    #poweredBy img {
-      width: 15rem;
-      max-width: 90vw;
-    }
+             
 
-    #poweredBy {
 
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.9rem;
-      font-weight: bold;
-      margin-bottom: 2rem;
-    }
-  </style>
+                const urlSearchParams = new URLSearchParams(window.location.search);
+
+                let defaultParams = urlSearchParams.get("params");
+                if(defaultParams){
+                    defaultParams = JSON.parse(atob(defaultParams));
+                }
+                const defaultModel = (defaultParams ? "Custom" : urlSearchParams.get("preset")) || "Damaged-Helmet";
+
+                const selectorEl= document.createElement("select");
+
+                const entries=Object.entries(models);
+                entries.push(["Custom","Custom"]);
+
+                for(const [k,v] of entries){
+                    const option = document.createElement("option");
+                    option.innerText = k;
+                    option.value = k;
+                    if(k===defaultModel){
+                        option.selected=true;
+                    }
+                    selectorEl.appendChild(option);
+                }
+
+                const paramsEl= document.createElement("textarea");
+                paramsEl.id="params"
+                paramsEl.value = JSON.stringify(defaultParams||models[defaultModel]||"{}", null, 2);
+
+                selectorEl.addEventListener("change", () => {
+                    const selected = selectorEl.value;
+                    const params = models[selected];
+                    if(!params)return;
+                    paramsEl.value = JSON.stringify(params, null, 2);                  
+                });
+
+            
+             
+                const showBtnEl= document.createElement("button");
+                showBtnEl.innerText = "Show";
+                showBtnEl.addEventListener("click", () => {
+                    let selectedModel;
+                    for(const [k,v] of Object.entries(models)){
+                        if(JSON.stringify(v,null,2)===paramsEl.value){
+                            selectedModel=k;
+                            break;
+                        }
+                    }
+
+                    const urlSearchParams = new URLSearchParams(window.location.search);
+                    if(selectedModel){
+                        urlSearchParams.set("preset", selectedModel);
+                        urlSearchParams.delete("params");
+                    }else{
+                        urlSearchParams.delete("preset");
+                        const b64Params=btoa(paramsEl.value);
+                        urlSearchParams.set("params", b64Params);
+                    }
+
+                    window.location.search = urlSearchParams.toString();
+
+
+                });
+
+                const copyEmbedBtnEl= document.createElement("button");
+                copyEmbedBtnEl.innerText = "Copy Embedding Code";
+                copyEmbedBtnEl.addEventListener("click",()=>{
+                    const iframe= document.querySelector("iframe.modelView");
+                    const code=iframe.outerHTML;
+                    
+                    // copy to clipboard
+                    const el = document.createElement('textarea');
+                    el.value = code;
+                    document.body.appendChild(el);
+                    el.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(el);
+
+                    alert("Copied to clipboard");
+
+                });
+
+
+
+
+                const show=async ()=>{
+               
+
+                    const params = JSON.parse(paramsEl.value);
+                    // params.model = applyCorsProxy(params.model);
+                    // params.environment = applyCorsProxy(params.environment);
+
+                    const baseUrl = window.location.href;
+                    const iframe = document.querySelector("iframe.modelView");
+
+                    const isLocalHost=window.location.hostname==="localhost"||window.location.hostname==="127.0.0.1";                    
+                    if(isLocalHost){
+                        let sandboxAttrib=iframe.getAttribute("sandbox");
+                        if(!sandboxAttrib){
+                            sandboxAttrib="";
+                        }
+                        if(!sandboxAttrib.includes("allow-same-origin")){
+                            sandboxAttrib+=" allow-same-origin";
+                        }
+                        iframe.setAttribute("sandbox",sandboxAttrib);                        
+                    }
+
+                    ModelViewer.show(baseUrl, params, iframe);
+                }
+
+                document.body.appendChild(paramsEl);             
+                document.body.appendChild(selectorEl);
+                document.body.appendChild(showBtnEl);
+                document.body.appendChild(copyEmbedBtnEl);
+
+
+                 show();
+            });
+        </script>
 </head>
 
-<body>
-  <canvas style="display:none" id="jme"></canvas>
+<body >
+    <iframe 
+        style="background:transparent;border:none;" 
+        class="modelView" 
+        src=""
+        sandbox="allow-scripts allow-pointer-lock" 
+    ></iframe>
 
-  <button id="startJme" onClick="init('pbr')"> Start PBR Demo</button>
-  <button id="startJme" onClick="init('physics')"> Start Physics Demo</button>
-  <button id="startJme" onClick="init('shadows')"> Start Shadows Demo</button>
-  <button id="startJme" onClick="init('audio')"> Start Audio Demo</button>
-  <button id="startJme" onClick="init('inst')"> Start Instancing Demo</button>
-  <button id="startJme" onClick="init('demo1')"> Start Demo1</button>
-  <button id="startJme" onClick="init('pbr2')"> Start PBR Demo 2</button>
 
 
 </body>

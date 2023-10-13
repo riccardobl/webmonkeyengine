@@ -1,0 +1,9 @@
+/*
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Headers: *
+
+/*.cfg
+  Content-Type: text/plain
+
+/*.properties
+  Content-Type: text/plain  

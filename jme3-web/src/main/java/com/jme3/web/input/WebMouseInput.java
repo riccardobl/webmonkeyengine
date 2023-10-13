@@ -23,7 +23,7 @@ import com.jme3.web.context.WebCanvasElement;
 
 public class WebMouseInput implements MouseInput, EventListener {
     private WebCanvasElement canvas;
-    private boolean cursorVisible = false;
+    private boolean cursorVisible = true;
     private RawInputListener listener;
     private int xPos=0, yPos=0, wheelPos;
     private boolean undefinedPos = true;

@@ -15,6 +15,8 @@
  */
 package org.teavm.classlib.java.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -82,7 +84,7 @@ public final class TScanner implements Iterator<String> {
     private static final Pattern LINE_PATTERN;
 
     static {
-        String terminator = "\n|\r\n|\r|\u0085|\u2028|\u2029"; //$NON-NLS-1$
+        String terminator = "\n"; //$NON-NLS-1$
 
         LINE_TERMINATOR = Pattern.compile(terminator);
 
@@ -193,6 +195,21 @@ public final class TScanner implements Iterator<String> {
         if (null == src) {
             throw new NullPointerException(); //$NON-NLS-1$
         }
+      
+
+        try{
+            byte chunk[] = new byte[1024];
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            int len;
+            while ((len = src.read(chunk)) != -1) {
+                baos.write(chunk, 0, len);
+            }
+            byte[] bytes = baos.toByteArray();            
+            src = new ByteArrayInputStream(bytes);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
+
         try {
             input = new InputStreamReader(src, charsetName);
         } catch (UnsupportedEncodingException e) {

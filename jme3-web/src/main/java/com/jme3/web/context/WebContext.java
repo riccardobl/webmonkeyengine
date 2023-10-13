@@ -15,14 +15,16 @@ import com.jme3.renderer.opengl.GLRenderer;
 import com.jme3.system.*;
 import com.jme3.util.res.ResourcesLoader;
 import com.jme3.web.context.WebCanvasElement;
-import com.jme3.web.filesystem.WebResourceLoaderImpl;
-import com.jme3.web.input.WebKeyInput;
+ import com.jme3.web.input.WebKeyInput;
 import com.jme3.web.input.WebMouseInput;
 import com.jme3.web.input.WebTouchInput;
 import com.jme3.web.rendering.WebGL;
 import com.jme3.web.rendering.WebGLOptions;
 import com.jme3.web.rendering.WebGLWrapper;
 
+import java.lang.annotation.Native;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
@@ -30,7 +32,7 @@ import org.teavm.jso.browser.Window;
 import org.teavm.jso.dom.xml.Document;
 
 
-public class WebContext implements JmeContext, Runnable {
+public class WebContext implements JmeContext {
    
 
     protected static final Logger logger = Logger.getLogger(WebContext.class.getName());
@@ -45,7 +47,7 @@ public class WebContext implements JmeContext, Runnable {
     protected AppSettings settings = new AppSettings(true);
     protected Timer timer;
     protected SystemListener listener;
-    protected Renderer renderer;
+    protected GLRenderer renderer;
     protected WebCanvasElement canvas;
     protected boolean autofit=false;
 
@@ -112,12 +114,33 @@ public class WebContext implements JmeContext, Runnable {
         
         logger.fine("Searching viable canvas...");
       
-        WebCanvasElement canvas = (WebCanvasElement) doc.querySelector("canvas#jme");
+        WebCanvasElement canvas = (WebCanvasElement) NativeUtils.getCanvas();
+        if (canvas == null) doc.querySelector("canvas#jme");
         if (canvas == null) {
             logger.fine("Canvas not found, create a new one.");
             canvas = (WebCanvasElement) doc.createElement("canvas");
             canvas.setId("jme");
             doc.getElementsByTagName("body").get(0).appendChild(canvas);
+        }
+
+
+        boolean enableDebug = settings.isGraphicsDebug();
+        if (!enableDebug) {
+            try {
+                URL currentUrl = new URL(Window.current().getLocation().getFullURL());
+                if (currentUrl.getQuery() != null && currentUrl.getQuery().contains("debug")) {
+                    enableDebug = true;
+                }
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            
+        }
+        
+
+        if (enableDebug) {
+            logger.warning("Debug mode enabled. Performance may be degraded.");
+            NativeUtils.loadWebGLdebug();
         }
 
 
@@ -146,12 +169,12 @@ public class WebContext implements JmeContext, Runnable {
         attrs.setPowerPreference("high-performance");
         attrs.setDepth(true);
         attrs.setAlpha(true);
-        attrs.setDesynchronized(true);
-        attrs.setPremultipliedAlpha(true);
-        attrs.setPreserveDrawingBuffer(true);
+        attrs.setDesynchronized(!settings.isGraphicsDebug());
+        attrs.setPremultipliedAlpha(false);
+        attrs.setPreserveDrawingBuffer(false);
         
 
-        attrs.setAntialias(settings.getSamples()>1);
+        attrs.setAntialias(true);
 
         WebGLWrapper ctx = (WebGLWrapper) canvas.getContext("webgl2", attrs);
         if (ctx == null) {
@@ -160,12 +183,13 @@ public class WebContext implements JmeContext, Runnable {
         ctx.pixelStorei(WebGLWrapper.UNPACK_COLORSPACE_CONVERSION_WEBGL, WebGLWrapper.NONE);
 
         logger.fine("Starting WebGL renderer...");
-        WebGL gl = new WebGL(ctx);
+        WebGL gl = new WebGL(ctx,settings);
         renderer = new GLRenderer(gl, gl, gl);
         renderer.initialize();
         gl.setCaps(renderer.getCaps());
 
 
+        if(settings.isGraphicsDebug())renderer.setDebugEnabled(true);
 
         logger.fine("sRGB: "+settings.isGammaCorrection());
         // renderer.setMainFrameBufferSrgb(settings.isGammaCorrection()); UNSUPPORTED?
@@ -186,35 +210,20 @@ public class WebContext implements JmeContext, Runnable {
         logger.fine("WebGL destroyed.");
     }
 
-    private void loop() {
-        listener.update();
-        //  if (frameRate > 0) {
-        //         sync(frameRate);
-        //     }
-        Window.requestAnimationFrame((t) -> {
-            loop();
-           
-        });
+
+    private void animationDrivenLoop() {
+        loop();
+        if(needClose.get()) {
+            doDestroy();
+        } else {
+            Window.requestAnimationFrame((t) -> {
+                animationDrivenLoop();
+            });
+        }
     }
     
-    @Override
-    public void run() {
-        
- 
-        
-
-        doInit();
-
-        // loop();
-        
-        // try {
-        //     Thread.sleep(999999999);
-        // } catch (InterruptedException e) {
-        //     // TODO Auto-generated catch block
-        //     e.printStackTrace();
-        // }
-        do {
-            if (settings.isResizable()) {
+    private void loop() {
+         if (settings.isResizable()) {
                 
                 canvas.canvasFitParent();
                 int w = canvas.getClientWidth();
@@ -238,13 +247,24 @@ public class WebContext implements JmeContext, Runnable {
             }
             
             listener.update();
+    }
+    
+    
+    private  void start(boolean animationDriven) {
+        doInit();
+        if (animationDriven) {
+            animationDrivenLoop();
+        } else {
+            do {
+                loop();
+                if (frameRate > 0) {
+                    sync(frameRate);
+                }
+            } while (!needClose.get());
+            doDestroy();
+        }
+        
 
-            if (frameRate > 0) {
-                sync(frameRate);
-            }
-        } while (!needClose.get());
-
-        doDestroy();
     }
 
     @Override
@@ -258,7 +278,13 @@ public class WebContext implements JmeContext, Runnable {
             logger.warning("create() called when WebGL context is already created!");
             return;
         }
-        new Thread(this, THREAD_NAME).start();
+        
+        boolean animationDriven = (boolean) settings.getOrDefault("AnimationDrivenLoop", true);
+        if (animationDriven) {           
+            start(animationDriven);
+        } else {
+            new Thread(()->start(animationDriven), THREAD_NAME).start();    
+        }       
 
     }
 

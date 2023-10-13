@@ -36,9 +36,11 @@ import com.jme3.renderer.Caps;
 
 import com.jme3.renderer.RendererException;
 import com.jme3.renderer.opengl.*;
+import com.jme3.system.AppSettings;
 import com.jme3.texture.Image.Format;
 import com.jme3.util.BufferUtils;
 import com.jme3.web.context.HeapAllocator;
+import com.jme3.web.context.NativeUtils;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -86,7 +88,7 @@ public class WebGL implements GL, GL2, GLES_30, GLExt, GLFbo {
     Map<Integer,JSObject> pMap = new HashMap<>();
     WebGLLintExt debugExt;
     WebGLLintConfig debugCfg;
-    Map<String,String> webgl2glextMap= new HashMap<>();
+    Map<String, String> webgl2glextMap = new HashMap<>();
     private final Logger logger = Logger.getLogger(WebGL.class.getName());
 
     private void enableExtension(String webGlName, String glName) {
@@ -102,7 +104,7 @@ public class WebGL implements GL, GL2, GLES_30, GLExt, GLFbo {
         }
     }
 
-    public WebGL(WebGLWrapper ctx) {
+    public WebGL(WebGLWrapper ctx,AppSettings settings) {
         this.gl = ctx;
         
         enableExtension("WEBGL_compressed_texture_s3tc","GL_EXT_texture_compression_s3tc");
@@ -127,6 +129,12 @@ public class WebGL implements GL, GL2, GLES_30, GLExt, GLFbo {
         }
 
         gl.enable(WebGLRenderingContext.DITHER);
+
+        if (settings.getSamples() > 1) {
+            gl.enable(WebGLWrapper.SAMPLE_COVERAGE);
+            // gl.sampleCoverage(0.5f, false);
+
+        }
 
 
         // enableExtension("WEBGL_compressed_texture_pvrtc");
@@ -932,7 +940,22 @@ public class WebGL implements GL, GL2, GLES_30, GLExt, GLFbo {
 
     @Override
     public void glBlitFramebufferEXT(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, int mask, int filter) {
-        gl.blitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
+        boolean useWorkAround = true;
+        if (useWorkAround) {
+            // workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=1581171
+
+            boolean blitDepth = (mask & GL.GL_DEPTH_BUFFER_BIT) != 0;
+
+            if (blitDepth) mask &= ~GL.GL_DEPTH_BUFFER_BIT;
+
+            gl.blitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
+
+            if (blitDepth) {
+                gl.blitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, GL.GL_DEPTH_BUFFER_BIT, filter);
+            }
+        } else {
+            gl.blitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
+        }
 
     }
 
@@ -965,19 +988,19 @@ public class WebGL implements GL, GL2, GLES_30, GLExt, GLFbo {
 
     @Override
     public void glGetMultisample(int pname, int index, FloatBuffer val) {
-        throw new UnsupportedOperationException("Multisample renderbuffers not available on WebGL");
+        throw new UnsupportedOperationException("glGetMultisamplefv not available on WebGL 2");
 
     }
 
     @Override
     public void glRenderbufferStorageMultisampleEXT(int target, int samples, int internalformat, int width, int height) {
-        throw new UnsupportedOperationException("Multisample renderbuffers not available on WebGL");
+        gl.renderbufferStorageMultisample(target, samples, internalformat, width, height);
 
     }
 
     @Override
     public void glTexImage2DMultisample(int target, int samples, int internalformat, int width, int height, boolean fixedSampleLocations) {
-        throw new UnsupportedOperationException("Multisample textures not available on WebGL");
+        throw new UnsupportedOperationException("Multisample textures not available on WebGL 2");
 
     }
 
@@ -1057,7 +1080,7 @@ public class WebGL implements GL, GL2, GLES_30, GLExt, GLFbo {
     @Override
     public void glGenerateMipmapEXT(int param1) {       
         gl.generateMipmap(param1);
-
+        
     }
 
     @Override
@@ -1304,5 +1327,26 @@ public class WebGL implements GL, GL2, GLES_30, GLExt, GLFbo {
             WebGLVertexArrayObject vao = gl.createVertexArray();
             arrays.put(i, _pS(vao));
         }
+    }
+
+
+    public void glPushDebugGroup(int source, int id, String message) {
+        if (debugExt==null) return;
+    }
+
+    public void glPopDebugGroup() {
+        if (debugExt==null) return;
+    }
+
+    public void glObjectLabel(int identifier, int id, String label) {
+        if (debugExt==null) return;
+        JSObject jsobj = _pG(id);
+        if (jsobj != null) {
+            NativeUtils.setSpectorMetaName(jsobj, label);
+            debugExt.tagObject(jsobj, label);
+
+        }
+
+
     }
 }

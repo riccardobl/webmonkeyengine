@@ -1,9 +1,10 @@
 
+
 plugins {
     id "java"
     id "war"
     id "org.teavm" version "0.9.0-dev-10"
-}
+  }
 
 import java.security.MessageDigest
 import java.nio.file.Files
@@ -25,12 +26,10 @@ repositories {
 
 dependencies {
     compileOnlyWithResources project(':jme3-core')
-    compileOnlyWithResources project(':jme3-testdata')
     compileOnlyWithResources project(':jme3-plugins')
     compileOnlyWithResources project(':jme3-effects')
     compileOnlyWithResources project(':jme3-terrain')
     api project(':jme3-core')
-    api project(':jme3-testdata')
 
     api( project(':jme3-plugins')){
         exclude group: 'com.google.code.gson', module: 'gson'
@@ -44,6 +43,7 @@ dependencies {
 
     // api (project(':jme3-jbullet'))
 
+
     implementation "${teaVM_GROUPS}:teavm-tooling:$teaVM_VERSION"
     implementation "${teaVM_GROUPS}:teavm-core:$teaVM_VERSION"
     implementation "${teaVM_GROUPS}:teavm-classlib:$teaVM_VERSION"
@@ -52,6 +52,7 @@ dependencies {
     implementation "${teaVM_GROUPS}:teavm-jso-apis:$teaVM_VERSION"
     implementation "${teaVM_GROUPS}:teavm-jso:$teaVM_VERSION"
     implementation "${teaVM_GROUPS}:teavm-metaprogramming-api:$teaVM_VERSION"
+    implementation project(":jme3-jmetx")
  
 }
 
@@ -174,7 +175,7 @@ teavm.js {
     // processMemory=6000
     fastGlobalAnalysis=false
     // optimization=org.teavm.gradle.api.OptimizationLevel.NONE
-    sourceMap=false
+    sourceMap=true
     
     def classesToPreserve=[
         "**/J3MLoader.java",
@@ -202,10 +203,12 @@ teavm.js {
         "**/HDRLoader.java",
          "**/TGALoader.java",
          "**/DDSLoader.java",
+         "**/Image.java",
+            "**/JmeTxRoot.java",
 
         "**/BitmapFontLoader.java",
                 "**/LightProbe.java",
-
+"**/WebResourceLoaderImplNoCache.java",
         // "**/SkeletonLoader.java",
         // "**/MaterialLoader.java",
         // "**/SceneLoader.java",
@@ -240,3 +243,133 @@ teavm.js {
     
     targetFileName = "jmeapp.js"
 }
+
+
+// map of os-arch to download like of caddy server
+def caddyLinks=[
+    "linux-amd64":"https://caddyserver.com/api/download?os=linux&arch=amd64",
+    "windows-arm64":"https://caddyserver.com/api/download?os=windows&arch=amd64",
+    "darwin-amd64":"https://caddyserver.com/api/download?os=darwin&arch=amd64",
+    "darwin-arm64":"https://caddyserver.com/api/download?os=darwin&arch=arm64",
+    "linux-arm64":"https://caddyserver.com/api/download?os=linux&arch=arm64",
+]
+
+def getOsArch(){
+    def os=org.gradle.internal.os.OperatingSystem.current()
+    def osName="linux";
+    if(os.isWindows()) osName="windows";
+    else if(os.isMacOsX()) osName="darwin";
+
+    def arch=System.getProperty('os.arch');
+    def archName="amd64";
+    if(arch=="arm64"||arch=="aarch64") archName="arm64";
+
+
+    return  osName+"-"+archName;   
+
+}
+task downloadCaddyIfDoesntExist {
+    def osArch = getOsArch()
+    def targetDir = file("${project.buildDir}/caddy-${osArch}")
+    def targetFile = file("${targetDir}/caddy")
+
+    def url = caddyLinks[osArch]
+    if (url == null) throw new RuntimeException("No caddy download link for $osArch")
+    if (!targetDir.exists()) targetDir.mkdirs()
+
+    if (!targetFile.exists()) {
+        println("Download caddy in "+targetFile)
+        new URL(url).withInputStream { inputStream ->
+            targetFile.withOutputStream { outputStream ->
+                outputStream << inputStream
+            }
+        }
+
+        // Make the downloaded file executable if needed
+        targetFile.setExecutable(true)
+
+        // Check if the download was successful
+        if (!targetFile.exists()) {
+            throw new RuntimeException("Failed to download Caddy")
+        }
+    } else {
+        println "Caddy already exists: $targetFile"
+    }
+    
+}
+task generateCaddyfile {
+        def caddyfileContent = """{
+        auto_https off
+}
+:8080 {
+        root * ${project.buildDir}/generated/teavm/js/
+        encode gzip
+        file_server browse
+}
+"""
+        
+        def caddyfilePath = file("${project.buildDir}/Caddyfile")
+
+        caddyfilePath.text = caddyfileContent
+    
+}
+
+
+// task startServer(type: Exec) {
+//     def osArch=getOsArch();
+//     def targetDir=file("${project.buildDir}/caddy-"+osArch);
+
+    
+//     // Print a debug message
+//         println "Starting Caddy server..."
+
+//         // Construct the command line
+//         def command = "${targetDir}/caddy"
+//         def configFile = "${project.buildDir}/Caddyfile"
+        
+//         println "Command: $command"
+//         println "Config File: $configFile"
+
+//         // Execute the command
+//         commandLine command, 'start', '--config', configFile
+//         workingDir project.buildDir
+//         ignoreExitValue true
+   
+ 
+// }
+task startServer {
+    def osArch = getOsArch()
+    def targetDir = file("${project.buildDir}/caddy-${osArch}")
+
+    doLast {
+   
+
+        // Start the Caddy process
+        def processBuilder = new ProcessBuilder("${targetDir}/caddy", "run", "--config", "${project.buildDir}/Caddyfile")
+            .directory(project.buildDir)
+            .inheritIO();
+
+        
+        println "Command: ${processBuilder.command()}"
+
+        println "Starting Caddy server in "+project.buildDir
+        def caddyProcess = processBuilder.start()
+
+        // Add a shutdown hook to gracefully stop Caddy on SIGTERM
+        Runtime.getRuntime().addShutdownHook(new Thread({
+            println "Received SIGTERM, stopping Caddy gracefully..."
+            caddyProcess.destroy()
+        }))
+
+      
+        // Wait for the Caddy process to finish (optional)
+        def exitCode = caddyProcess.waitFor()
+        println "Caddy process exited with code: $exitCode"
+
+        
+        caddyProcess.destroy()
+
+        
+    }
+}
+startServer.dependsOn('downloadCaddyIfDoesntExist') 

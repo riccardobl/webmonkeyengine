@@ -115,7 +115,9 @@ vec4 getColor(vec4 color){
         return color;
     #endif
     #ifdef USE_AO
-        return getColor(m_Texture,texCoord) * color;
+        vec4 c = getColor(m_Texture,texCoord);
+        c.rgb *= color.rgb;
+        return c;
     #endif
 
     return getColor(m_Texture,texCoord);

@@ -823,4 +823,10 @@ void deleteVertexArray(WebGLVertexArrayObject vao);
 
 WebGLVertexArrayObject createVertexArray();
 
+
+void renderbufferStorageMultisample(int target, int samples, int internalformat, int width, int height);
+    
+
+
+
 }

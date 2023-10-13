@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Model Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <script type="text/javascript" charset="utf-8" src="jme.js"></script>
+  <script type="text/javascript" charset="utf-8" src="utils.js"></script>
+  <script>
+
+    async function init() {    
+      jme.start(document.querySelector('canvas#jme'));
+      const searchParams = new URLSearchParams(window.location.search);
+      const keyValues={};
+      for (const [key, value] of searchParams) {
+        keyValues[key]=JSON.parse(value);
+      }
+      await expo.setEnvironment(keyValues);
+      await expo.setModel(keyValues);
+
+    }
+  </script>
+  <style>
+    :root{
+      --color0: #1a1a1a;
+      --color1: #d88d02;
+      --logo: url("./jmelogo.webp");
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: transparent;
+      font-size: 1.3rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+
+    }
+
+    canvas#jme {
+      top: 0;
+      left: 0;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+
+    #jmeProgress {
+      display: flex;
+      position: fixed;
+      top: 0;
+      left: 0;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      background: transparent;
+      color: var(--color1);
+      font-family: monospace;
+      text-transform: uppercase;
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    #jmeProgress progress {
+      all: unset;
+      -webkit-appearance: none;
+      margin: 1rem;
+      width: 32rem;
+      max-width: 90%;
+      height: 0.5rem;
+      background: var(--color0);
+      box-shadow: 0 0 133px var(--color1) ;
+      border: 2px solid var(--color1);
+      border-radius: 32px;
+      overflow: hidden;
+    }
+
+    #jmeProgress progress::-webkit-progress-bar {
+      background-color: var(--color0);
+    }
+
+    #jmeProgress progress::-webkit-progress-value {
+      background-color: var(--color1);
+    }
+
+    #jmeProgress progress::-moz-progress-bar {
+      background-color: var(--color1);
+    }
+
+    #poweredBy .img {
+      width: 15rem;
+      height: 15rem;
+      max-width: min(60vh,90vw);
+      max-height: min(60vh,90vw);
+      background-image: var(--logo);
+      background-size: contain;
+        background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    #poweredBy {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: bold;
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+
+<body onload="init()">
+  <canvas id="jme"></canvas>
+ 
+
+</body>
+
+</html>

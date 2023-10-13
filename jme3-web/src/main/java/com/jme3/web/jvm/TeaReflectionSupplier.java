@@ -17,7 +17,7 @@ import org.teavm.model.MethodDescriptor;
 import org.teavm.model.MethodReader;
 import org.teavm.model.ValueType;
 
-
+import com.jme.jmetx.JmeTxRoot;
 import com.jme3.anim.util.JointModelTransform;
 import com.jme3.asset.AssetLoader;
 import com.jme3.asset.AssetLocator;
@@ -35,11 +35,12 @@ import com.jme3.scene.plugins.gltf.ext.KHR_materials_unlit.UnlitExtensionLoader;
 import com.jme3.scene.plugins.gltf.ext.KHR_texture_transform.TextureTransformExtensionLoader;
 import com.jme3.system.JmeSystem;
 import com.jme3.system.JmeSystemDelegate;
+import com.jme3.texture.Image;
 import com.jme3.texture.TextureProcessor;
 import com.jme3.util.SafeArrayList;
 import com.jme3.util.clone.JmeCloneable;
 import com.jme3.web.context.HeapAllocator;
-import com.jme3.web.filesystem.WebResourceLoaderImpl;
+import com.jme3.web.filesystem.WebLocator;
 import com.jme3.web.filesystem.WebResourceLoaderImplNoCache;
 import com.jme3.json.*;
 import com.jme3.light.LightProbe;
@@ -68,7 +69,6 @@ public class TeaReflectionSupplier implements ReflectionSupplier {
         TeaReflectionSupplier.addReflectionClass(SafeArrayList.class);
         TeaReflectionSupplier.addReflectionClass(HeapAllocator.class);
         TeaReflectionSupplier.addReflectionClass(TeaJSONParser.class);
-        TeaReflectionSupplier.addReflectionClass(WebResourceLoaderImpl.class);
         TeaReflectionSupplier.addReflectionClass(WebResourceLoaderImplNoCache.class);
                 TeaReflectionSupplier.addReflectionClass(LightProbe.class);
        TeaReflectionSupplier.addReflectionClass(PBRSpecGlossExtensionLoader.class);
@@ -77,7 +77,11 @@ public class TeaReflectionSupplier implements ReflectionSupplier {
        TeaReflectionSupplier.addReflectionClass( TextureTransformExtensionLoader.class);
        TeaReflectionSupplier.addReflectionClass( SpeakerExtensionLoader.class);
        TeaReflectionSupplier.addReflectionClass( BulletRigidbodyExtensionLoader.class);
+       TeaReflectionSupplier.addReflectionClass( WebLocator.class);
+       TeaReflectionSupplier.addReflectionClass(JmeTxRoot.class);
+                TeaReflectionSupplier.addReflectionClass(Image.class);
 
+                
         // TeaReflectionSupplier.addReflectionClass(GenericConstraint.class);
         // TeaReflectionSupplier.addReflectionClass(AnimControl.class);
 

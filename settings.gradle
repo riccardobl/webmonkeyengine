@@ -1,10 +1,14 @@
 pluginManagement {  
   repositories {      
     gradlePluginPortal()
+    
             maven { url = uri("https://teavm.org/maven/repository") }
         maven { url "https://repo.repsy.io/mvn/riccardobl/jme3-teavm" }
     }
 }
+
+
+ 
 /**
  * This is the global settings file used by all subprojects.
  **/
@@ -50,3 +54,4 @@ if(buildAndroidExamples == "true"){
 }
 
 include 'jme3-web'
+include 'jme3-jmetx'
