@@ -104,7 +104,6 @@ public class EnvironmentProbeControl extends LightProbe implements Control {
     @Override
     public void render(RenderManager rm, ViewPort vp) {
         if (bakeNeeded) {
-            System.out.println("BAKE");
             bakeNeeded = false;
             rebakeNow(rm);
         }
@@ -157,7 +156,10 @@ public class EnvironmentProbeControl extends LightProbe implements Control {
         baker.bakeSphericalHarmonicsCoefficients();
 
         setPrefilteredMap(baker.getSpecularIBL());
-        setNbMipMaps(getPrefilteredEnvMap().getImage().getMipMapSizes().length);
+        
+        int[] mipSizes = getPrefilteredEnvMap().getImage().getMipMapSizes();
+        setNbMipMaps(mipSizes != null ? mipSizes.length : 1);
+        
         setShCoeffs(baker.getSphericalHarmonicsCoefficients());
         setPosition(Vector3f.ZERO);
         setReady(true);
